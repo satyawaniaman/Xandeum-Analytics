@@ -1,0 +1,43 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PNode {
+  id                String    @id @default(cuid())
+  address           String    @unique // "ip:port"
+  pubkey            String? // can be null
+  version           String?
+  lastSeenTimestamp BigInt? // unix timestamp from API
+  lastSeen          DateTime?
+
+  // --- New fields from get-stats ---
+  // metadata
+  totalBytes    BigInt?
+  totalPages    Int?
+  lastUpdatedTs Int? // unix ts from metadata.last_updated
+
+  // stats
+  cpuPercent      Float?
+  ramUsedBytes    BigInt?
+  ramTotalBytes   BigInt?
+  uptimeSeconds   Int?
+  packetsReceived Int?
+  packetsSent     Int?
+  activeStreams   Int?
+
+  // global storage
+  fileSizeBytes BigInt?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([lastSeenTimestamp])
+  @@index([cpuPercent])
+  @@index([version])
+}

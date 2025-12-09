@@ -1,0 +1,48 @@
+{
+  "name": "xandeum-analytics",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "rm -rf dist/ && tsc",
+    "start": "node dist/index.js",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate deploy",
+    "migrate:dev": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:seed": "tsx src/scripts/sync-pnodes.ts",
+    "test:stats": "tsx src/scripts/test-stats.ts",
+    "test:prpc": "tsx src/scripts/test-prpc.ts",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "@hono/zod-openapi": "^0.18.3",
+    "@prisma/client": "^6.1.0",
+    "@upstash/redis": "^1.35.7",
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "hono": "^4.6.14",
+    "hono-pino": "^0.8.0",
+    "p-limit": "^6.1.0",
+    "pino": "^9.6.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20.17.10",
+    "bcrypt": "^5.1.1",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "prisma": "^6.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.1",
+    "uuid": "^11.0.3"
+  }
+}
