@@ -123,6 +123,10 @@ function mapNodeToDetailDto(node: PNode) {
     pubkey: node.pubkey,
     version: node.version,
 
+    // geolocation
+    longitude: node.longitude,
+    latitude: node.latitude,
+
     // status classification
     status,
     hasPublicRpc,

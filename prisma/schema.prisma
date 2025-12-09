@@ -9,35 +9,29 @@ datasource db {
 }
 
 model PNode {
-  id                String    @id @default(cuid())
-  address           String    @unique // "ip:port"
-  pubkey            String? // can be null
+  id                String    @id
+  address           String    @unique
+  pubkey            String?
   version           String?
-  lastSeenTimestamp BigInt? // unix timestamp from API
+  lastSeenTimestamp BigInt?
   lastSeen          DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime
+  activeStreams     Int?
+  cpuPercent        Float?
+  fileSizeBytes     BigInt?
+  lastUpdatedTs     Int?
+  packetsReceived   Int?
+  packetsSent       Int?
+  ramTotalBytes     BigInt?
+  ramUsedBytes      BigInt?
+  totalBytes        BigInt?
+  totalPages        Int?
+  uptimeSeconds     Int?
+  latitude          Float?
+  longitude         Float?
 
-  // --- New fields from get-stats ---
-  // metadata
-  totalBytes    BigInt?
-  totalPages    Int?
-  lastUpdatedTs Int? // unix ts from metadata.last_updated
-
-  // stats
-  cpuPercent      Float?
-  ramUsedBytes    BigInt?
-  ramTotalBytes   BigInt?
-  uptimeSeconds   Int?
-  packetsReceived Int?
-  packetsSent     Int?
-  activeStreams   Int?
-
-  // global storage
-  fileSizeBytes BigInt?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([lastSeenTimestamp])
   @@index([cpuPercent])
+  @@index([lastSeenTimestamp])
   @@index([version])
 }
