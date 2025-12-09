@@ -9,7 +9,7 @@ datasource db {
 }
 
 model PNode {
-  id                String    @id
+  id                String    @id @default(uuid())
   address           String    @unique
   pubkey            String?
   version           String?
@@ -28,8 +28,6 @@ model PNode {
   totalBytes        BigInt?
   totalPages        Int?
   uptimeSeconds     Int?
-  latitude          Float?
-  longitude         Float?
 
   @@index([cpuPercent])
   @@index([lastSeenTimestamp])
