@@ -2,6 +2,7 @@ import prisma from "./prisma-client";
 import { getPods } from "./prpc-client";
 import logger from "./loggin-client";
 import { batchGetStats, extractIpFromAddress } from "./pnode-stats-client";
+import { batchGetGeoLocation } from "./geo-client";
 
 export async function syncPnodesOnce() {
   const startTime = Date.now();
@@ -46,7 +47,37 @@ export async function syncPnodesOnce() {
   const addresses = pods.map((pod) => pod.address);
   const statsMap = await batchGetStats(addresses, 15); // 15 concurrent requests
 
-  // 3) Update database with stats results
+  // 3) Fetch geolocation for IPs that don't have it yet
+  const nodesWithoutGeo = await prisma.pNode.findMany({
+    where: { latitude: null },
+    select: { address: true },
+  });
+
+  if (nodesWithoutGeo.length > 0) {
+    logger.info(`Fetching geolocation for ${nodesWithoutGeo.length} nodes...`);
+    const ipsToGeolocate = nodesWithoutGeo.map((n) => extractIpFromAddress(n.address));
+    const geoMap = await batchGetGeoLocation(ipsToGeolocate, 5);
+
+    // Update nodes with geolocation data
+    for (const node of nodesWithoutGeo) {
+      const ip = extractIpFromAddress(node.address);
+      const geo = geoMap.get(ip);
+      if (geo) {
+        await prisma.pNode.update({
+          where: { address: node.address },
+          data: {
+            latitude: geo.latitude,
+            longitude: geo.longitude,
+            country: geo.country,
+            city: geo.city,
+          },
+        });
+      }
+    }
+    logger.info(`Geolocation updated for ${geoMap.size} nodes`);
+  }
+
+  // 4) Update database with stats results
   let successCount = 0;
   let failCount = 0;
 
@@ -114,3 +145,4 @@ export async function syncPnodesOnce() {
     `Sync complete in ${(duration / 1000).toFixed(2)}s`,
   );
 }
+

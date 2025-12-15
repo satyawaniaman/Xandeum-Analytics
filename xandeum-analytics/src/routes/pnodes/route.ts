@@ -158,6 +158,12 @@ function mapNodeToDetailDto(node: PNode) {
     packetsSent: node.packetsSent,
     activeStreams: node.activeStreams,
 
+    // geolocation
+    latitude: node.latitude,
+    longitude: node.longitude,
+    country: node.country,
+    city: node.city,
+
     // bookkeeping
     lastUpdatedTs: node.lastUpdatedTs,
     createdAt: node.createdAt?.toISOString?.() ?? null,

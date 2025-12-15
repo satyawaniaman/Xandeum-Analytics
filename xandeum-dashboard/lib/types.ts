@@ -59,6 +59,12 @@ export interface PNode {
     packetsSent: number | null;
     activeStreams: number | null;
 
+    // Geolocation
+    latitude: number | null;
+    longitude: number | null;
+    country: string | null;
+    city: string | null;
+
     // Timestamps
     lastUpdatedTs: number | null;
     createdAt: string | null;

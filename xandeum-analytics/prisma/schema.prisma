@@ -29,6 +29,12 @@ model PNode {
   totalPages        Int?
   uptimeSeconds     Int?
 
+  // Geolocation (populated from IP lookup)
+  latitude          Float?
+  longitude         Float?
+  country           String?
+  city              String?
+
   @@index([cpuPercent])
   @@index([lastSeenTimestamp])
   @@index([version])

@@ -86,30 +86,30 @@ export default function DashboardPage() {
                         title="Online Nodes"
                         value={onlineCount}
                         subtitle={`${((onlineCount / summary.total) * 100).toFixed(0)}% of network`}
-                        variant="success"
+                    // variant="success"
                     />
                     <StatCard
                         title="Public RPC"
                         value={summary.online_public}
                         subtitle="Port 6000 accessible"
-                        variant="success"
+                    // variant="success"
                     />
                     <StatCard
                         title="Private Nodes"
                         value={summary.online_private}
                         subtitle="Online but RPC private"
-                        variant="warning"
+                    // variant="warning"
                     />
                     <StatCard
                         title="Offline"
                         value={summary.offline}
                         subtitle={summary.offline > 0 ? "Needs attention" : "All nodes healthy"}
-                        variant={summary.offline > 0 ? "danger" : "default"}
+                    // variant={summary.offline > 0 ? "danger" : "default"}
                     />
                 </div>
 
                 {/* Global Node Map */}
-                <NodeMap nodes={nodes} />
+                <NodeMap nodes={nodes} summary={summary} />
 
                 {/* Charts Row */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

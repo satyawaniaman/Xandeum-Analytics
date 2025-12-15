@@ -10,8 +10,6 @@
     "migrate:dev": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:seed": "tsx src/scripts/sync-pnodes.ts",
-    "test:stats": "tsx src/scripts/test-stats.ts",
-    "test:prpc": "tsx src/scripts/test-prpc.ts",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",

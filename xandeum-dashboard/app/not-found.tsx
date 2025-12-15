@@ -20,11 +20,11 @@ export default function NotFound() {
         >
             <Empty>
                 <EmptyHeader>
-                    <EmptyMedia variant="icon">
+                    {/* <EmptyMedia variant="icon">
                         <div className="h-16 w-16 text-muted-foreground flex items-center justify-center">
                             <span className="text-6xl">👻</span>
                         </div>
-                    </EmptyMedia>
+                    </EmptyMedia> */}
 
                     <EmptyTitle className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-blue-500 bg-clip-text text-transparent">
                         404
