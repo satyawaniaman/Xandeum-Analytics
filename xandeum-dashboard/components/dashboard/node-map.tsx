@@ -1,9 +1,15 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DottedMap } from "@/components/ui/dotted-map";
 import { Button } from "@/components/ui/button";
+import {
+    ComposableMap,
+    Geographies,
+    Geography,
+    Marker,
+    ZoomableGroup,
+} from "react-simple-maps";
 import type { PNode, PNodesSummary } from "@/lib/types";
 
 interface NodeMapProps {
@@ -12,16 +18,16 @@ interface NodeMapProps {
     className?: string;
 }
 
-interface NodeMarker {
+interface LocationGroup {
     lat: number;
     lng: number;
-    size: number;
-    node: PNode;
-    x: number;
-    y: number;
+    count: number;
+    nodes: PNode[];
 }
 
-// Generate deterministic coordinates based on node ID
+const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+
+// Generate deterministic coordinates based on node ID (fallback)
 function getCoordinates(nodeId: number | undefined): { lat: number; lng: number } {
     const regions = [
         { lat: 37.7749, lng: -122.4194 }, // San Francisco
@@ -49,16 +55,6 @@ function getCoordinates(nodeId: number | undefined): { lat: number; lng: number 
     };
 }
 
-// Convert lat/lng to SVG coordinates
-function latLngToSvg(lat: number, lng: number, width: number, height: number): { x: number; y: number } {
-    const x = ((lng + 180) / 360) * width;
-    const y = ((90 - lat) / 180) * height;
-    return {
-        x: isNaN(x) ? 0 : x,
-        y: isNaN(y) ? 0 : y
-    };
-}
-
 function formatTimeAgo(seconds: number | null): string {
     if (seconds === null) return "Unknown";
     if (seconds < 60) return `${seconds}s ago`;
@@ -67,75 +63,44 @@ function formatTimeAgo(seconds: number | null): string {
 }
 
 export function NodeMap({ nodes, summary, className }: NodeMapProps) {
-    const [zoom, setZoom] = useState(1);
-    const [hoveredNode, setHoveredNode] = useState<NodeMarker | null>(null);
-    const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
-    const [pan, setPan] = useState({ x: 0, y: 0 });
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-    const containerRef = useRef<HTMLDivElement>(null);
+    const [zoom, setZoom] = useState(1.9);
+    const [center, setCenter] = useState<[number, number]>([10, 25]);
+    const [hoveredGroup, setHoveredGroup] = useState<LocationGroup | null>(null);
 
-    const MAP_WIDTH = 200;
-    const MAP_HEIGHT = 100;
+    // Group nodes by location (rounded to 1 decimal for clustering)
+    const locationGroups = useMemo(() => {
+        const groups = new Map<string, LocationGroup>();
 
-    // Convert nodes to map markers with validated SVG coordinates
-    // Use real lat/lng from API if available, otherwise fallback to generated
-    const markers: NodeMarker[] = nodes.slice(0, 100).map((node) => {
-        let lat: number, lng: number;
+        for (const node of nodes.slice(0, 200)) {
+            let lat: number, lng: number;
 
-        if (node.latitude !== null && node.longitude !== null) {
-            // Use real coordinates from IP geolocation
-            lat = node.latitude;
-            lng = node.longitude;
-        } else {
-            // Fallback to generated coordinates for nodes without geolocation
-            const coords = getCoordinates(node.id);
-            lat = coords.lat;
-            lng = coords.lng;
+            if (node.latitude !== null && node.longitude !== null) {
+                lat = node.latitude;
+                lng = node.longitude;
+            } else {
+                const coords = getCoordinates(node.id);
+                lat = coords.lat;
+                lng = coords.lng;
+            }
+
+            // Round for clustering
+            const key = `${lat.toFixed(1)},${lng.toFixed(1)}`;
+            const existing = groups.get(key);
+
+            if (existing) {
+                existing.count++;
+                existing.nodes.push(node);
+            } else {
+                groups.set(key, { lat, lng, count: 1, nodes: [node] });
+            }
         }
 
-        const svgCoords = latLngToSvg(lat, lng, MAP_WIDTH, MAP_HEIGHT);
-        return {
-            lat,
-            lng,
-            size: node.isOnline ? 1.5 : 1,
-            node,
-            x: svgCoords.x,
-            y: svgCoords.y,
-        };
-    });
+        return Array.from(groups.values());
+    }, [nodes]);
 
-    const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.5, 4));
-    const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.5, 1));
-    const handleReset = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
-
-    const handleMouseDown = (e: React.MouseEvent) => {
-        if (zoom > 1) {
-            setIsDragging(true);
-            setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-        }
-    };
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        if (isDragging) {
-            setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
-        }
-    };
-
-    const handleMouseUp = () => setIsDragging(false);
-
-    const handleMarkerHover = (e: React.MouseEvent, marker: NodeMarker) => {
-        if (containerRef.current) {
-            const rect = containerRef.current.getBoundingClientRect();
-            setHoverPosition({
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top,
-            });
-        }
-        setHoveredNode(marker);
-    };
-
-    const handleMarkerLeave = () => setHoveredNode(null);
+    const handleZoomIn = () => setZoom(prev => Math.min(prev * 1.5, 8));
+    const handleZoomOut = () => setZoom(prev => Math.max(prev / 1.5, 1));
+    const handleReset = () => { setZoom(1); setCenter([0, 20]); };
 
     return (
         <div className={`grid grid-cols-1 lg:grid-cols-3 gap-4 ${className}`}>
@@ -162,7 +127,7 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                             variant="ghost"
                             size="sm"
                             onClick={handleZoomIn}
-                            disabled={zoom >= 4}
+                            disabled={zoom >= 8}
                             className="h-7 w-7 p-0 text-zinc-500 hover:text-zinc-300"
                         >
                             +
@@ -178,144 +143,159 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                     </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                    <div
-                        ref={containerRef}
-                        className="relative h-64 w-full overflow-hidden rounded-lg bg-zinc-800/30 select-none"
-                        style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
-                        onMouseDown={handleMouseDown}
-                        onMouseMove={handleMouseMove}
-                        onMouseUp={handleMouseUp}
-                        onMouseLeave={() => { handleMouseUp(); handleMarkerLeave(); }}
-                    >
-                        <div
-                            className="relative transition-transform duration-100"
-                            style={{
-                                transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-                                transformOrigin: 'center center',
-                                width: '100%',
-                                height: '100%',
-                            }}
+                    <div className="relative h-[420px] w-full overflow-hidden rounded-lg bg-zinc-800/50">
+                        <ComposableMap
+                            projection="geoMercator"
+                            projectionConfig={{ scale: 120, center: [0, 20] }}
+                            style={{ width: "100%", height: "100%" }}
                         >
-                            {/* Base Map */}
-                            <DottedMap
-                                width={MAP_WIDTH}
-                                height={MAP_HEIGHT}
-                                mapSamples={8000}
-                                markers={[]}
-                                dotRadius={0.3}
-                                className="text-zinc-700"
-                            />
-
-                            {/* Interactive Markers Overlay */}
-                            <svg
-                                viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
-                                className="absolute inset-0 w-full h-full"
-                                style={{ zIndex: 10 }}
-                            >
-                                {markers.map((marker, index) => (
-                                    <g key={index}>
-                                        {/* Pulse animation for online nodes */}
-                                        {marker.node.isOnline && marker.x > 0 && marker.y > 0 && (
-                                            <circle
-                                                cx={marker.x}
-                                                cy={marker.y}
-                                                r={marker.size * 2}
-                                                fill={marker.node.status === "online_public" ? "#10b981" : "#f59e0b"}
-                                                opacity={0.3}
-                                                className="animate-ping"
-                                            />
-                                        )}
-                                        {/* Main marker */}
-                                        <circle
-                                            cx={marker.x}
-                                            cy={marker.y}
-                                            r={marker.size}
-                                            fill={
-                                                marker.node.status === "online_public" ? "#10b981" :
-                                                    marker.node.status === "online_private" ? "#f59e0b" :
-                                                        marker.node.status === "offline" ? "#ef4444" : "#71717a"
-                                            }
-                                            className="cursor-pointer transition-transform hover:scale-150"
-                                            style={{ pointerEvents: 'all' }}
-                                            onMouseEnter={(e) => handleMarkerHover(e, marker)}
-                                            onMouseLeave={handleMarkerLeave}
-                                        />
-                                    </g>
-                                ))}
-                            </svg>
-                        </div>
-
-                        {/* Hover Card */}
-                        {hoveredNode && (
-                            <div
-                                className="absolute z-50 pointer-events-none"
-                                style={{
-                                    left: Math.min(hoverPosition.x + 12, 400),
-                                    top: Math.max(hoverPosition.y - 100, 10),
+                            <ZoomableGroup
+                                zoom={zoom}
+                                center={center}
+                                onMoveEnd={(event: { coordinates: [number, number]; zoom: number }) => {
+                                    setCenter(event.coordinates);
+                                    setZoom(event.zoom);
                                 }}
                             >
-                                <div className="bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl p-3 min-w-48">
+                                <Geographies geography={GEO_URL}>
+                                    {({ geographies }: { geographies: Array<{ rsmKey: string }> }) =>
+                                        geographies.map((geo: { rsmKey: string }) => (
+                                            <Geography
+                                                key={geo.rsmKey}
+                                                geography={geo}
+                                                fill="#3f3f46"
+                                                stroke="#52525b"
+                                                strokeWidth={0.3}
+                                                style={{
+                                                    default: { outline: "none" },
+                                                    hover: { outline: "none", fill: "#52525b" },
+                                                    pressed: { outline: "none" },
+                                                }}
+                                            />
+                                        ))
+                                    }
+                                </Geographies>
+
+                                {locationGroups.map((group) => {
+                                    const hasOnline = group.nodes.some(n => n.isOnline);
+                                    const hasPublicRpc = group.nodes.some(n => n.status === "online_public");
+                                    const markerSize = 4; // Uniform size for all markers
+                                    const isHovered = hoveredGroup === group;
+
+                                    // Determine color based on node statuses in group
+                                    const fillColor = hasPublicRpc ? "#10b981" :
+                                        hasOnline ? "#f59e0b" : "#ef4444";
+
+                                    return (
+                                        <Marker
+                                            key={`${group.lat}-${group.lng}`}
+                                            coordinates={[group.lng, group.lat]}
+                                            onMouseEnter={() => setHoveredGroup(group)}
+                                            onMouseLeave={() => setHoveredGroup(null)}
+                                        >
+                                            {/* Hover ring */}
+                                            {isHovered && (
+                                                <circle
+                                                    r={markerSize + 4}
+                                                    fill="none"
+                                                    stroke={fillColor}
+                                                    strokeWidth={1.5}
+                                                    opacity={0.5}
+                                                />
+                                            )}
+                                            {/* Main marker - uniform size */}
+                                            <circle
+                                                r={isHovered ? markerSize + 1 : markerSize}
+                                                fill={fillColor}
+                                                stroke="#18181b"
+                                                strokeWidth={1}
+                                                className="cursor-pointer"
+                                                style={{
+                                                    transition: "all 0.15s ease-out",
+                                                    opacity: hasOnline ? 1 : 0.6,
+                                                }}
+                                            />
+                                        </Marker>
+                                    );
+                                })}
+                            </ZoomableGroup>
+                        </ComposableMap>
+
+                        {/* Hover Tooltip */}
+                        {hoveredGroup && hoveredGroup.nodes[0] && (
+                            <div className="absolute bottom-3 left-3 z-50">
+                                <div className="bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl p-3 min-w-52">
                                     <div className="flex items-center gap-2 mb-2">
                                         <span
-                                            className="h-2 w-2 rounded-full animate-pulse"
+                                            className="h-2 w-2 rounded-full"
                                             style={{
-                                                backgroundColor:
-                                                    hoveredNode.node.status === "online_public" ? "#10b981" :
-                                                        hoveredNode.node.status === "online_private" ? "#f59e0b" :
-                                                            hoveredNode.node.status === "offline" ? "#ef4444" : "#71717a"
+                                                backgroundColor: hoveredGroup.nodes.some(n => n.status === "online_public")
+                                                    ? "#10b981"
+                                                    : hoveredGroup.nodes.some(n => n.isOnline)
+                                                        ? "#f59e0b"
+                                                        : "#ef4444"
                                             }}
                                         />
                                         <span className="text-sm font-medium text-zinc-200">
-                                            {hoveredNode.node.ip}
+                                            {[hoveredGroup.nodes[0].city, hoveredGroup.nodes[0].country].filter(Boolean).join(", ") || "Unknown Location"}
                                         </span>
                                     </div>
                                     <div className="space-y-1 text-xs">
-                                        {(hoveredNode.node.city || hoveredNode.node.country) && (
-                                            <div className="flex justify-between">
-                                                <span className="text-zinc-500">Location</span>
-                                                <span className="text-zinc-300">
-                                                    {[hoveredNode.node.city, hoveredNode.node.country].filter(Boolean).join(", ")}
-                                                </span>
-                                            </div>
-                                        )}
-                                        <div className="flex justify-between">
+                                        {/* Always show first node details */}
+                                        <div className="flex justify-between gap-4">
+                                            <span className="text-zinc-500">IP</span>
+                                            <span className="text-zinc-300 font-mono text-right">
+                                                {hoveredGroup.nodes[0].ip}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between gap-4">
                                             <span className="text-zinc-500">Status</span>
                                             <span className="text-zinc-300 capitalize">
-                                                {hoveredNode.node.status.replace('_', ' ')}
+                                                {hoveredGroup.nodes[0].status.replace('_', ' ')}
                                             </span>
                                         </div>
-                                        <div className="flex justify-between">
+                                        <div className="flex justify-between gap-4">
                                             <span className="text-zinc-500">Version</span>
                                             <span className="text-zinc-300">
-                                                {hoveredNode.node.version || "—"}
+                                                {hoveredGroup.nodes[0].version || "—"}
                                             </span>
                                         </div>
-                                        <div className="flex justify-between">
+                                        <div className="flex justify-between gap-4">
                                             <span className="text-zinc-500">Last Seen</span>
                                             <span className="text-zinc-300">
-                                                {formatTimeAgo(hoveredNode.node.lastSeenAgoSeconds)}
+                                                {formatTimeAgo(hoveredGroup.nodes[0].lastSeenAgoSeconds)}
                                             </span>
                                         </div>
-                                        {hoveredNode.node.cpuPercent !== null && (
-                                            <div className="flex justify-between">
-                                                <span className="text-zinc-500">CPU</span>
-                                                <span className="text-zinc-300">
-                                                    {hoveredNode.node.cpuPercent.toFixed(1)}%
-                                                </span>
-                                            </div>
-                                        )}
-                                        {hoveredNode.node.uptimeHuman && (
-                                            <div className="flex justify-between">
-                                                <span className="text-zinc-500">Uptime</span>
-                                                <span className="text-zinc-300">
-                                                    {hoveredNode.node.uptimeHuman}
-                                                </span>
-                                            </div>
+                                        {/* Cluster info if multiple nodes */}
+                                        {hoveredGroup.count > 1 && (
+                                            <>
+                                                <div className="h-px bg-zinc-700 my-1.5" />
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-zinc-500">Total at Location</span>
+                                                    <span className="text-zinc-300 font-medium">
+                                                        {hoveredGroup.count} nodes
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-zinc-500">Online / Offline</span>
+                                                    <span>
+                                                        <span className="text-emerald-400">{hoveredGroup.nodes.filter(n => n.isOnline).length}</span>
+                                                        <span className="text-zinc-500"> / </span>
+                                                        <span className="text-red-400">{hoveredGroup.nodes.filter(n => !n.isOnline).length}</span>
+                                                    </span>
+                                                </div>
+                                            </>
                                         )}
                                     </div>
                                 </div>
                             </div>
                         )}
+
+                        {/* Location count badge */}
+                        <div className="absolute top-2 right-2 px-2 py-1 rounded-md bg-zinc-900/90 border border-zinc-700 text-xs">
+                            <span className="text-zinc-500">Locations </span>
+                            <span className="font-medium text-zinc-200">{locationGroups.length}</span>
+                        </div>
                     </div>
 
                     {/* Legend */}
@@ -336,77 +316,105 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                 </CardContent>
             </Card>
 
-            {/* Stats Panel - 1/3 width */}
+            {/* Geographic Insights Panel - 1/3 width */}
             <Card className="rounded-xl border border-zinc-800 bg-zinc-900/50">
                 <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-zinc-400">
-                        Network Overview
+                        Geographic Insights
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {/* Total Nodes */}
-                    <div className="flex items-center justify-between">
-                        <span className="text-zinc-500 text-sm">Total Nodes</span>
-                        <span className="text-2xl font-bold text-zinc-100">{summary.total}</span>
+                    {/* Coverage Stats */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="p-2 rounded-lg bg-zinc-800/50">
+                            <div className="text-lg font-bold text-zinc-100">{locationGroups.length}</div>
+                            <div className="text-xs text-zinc-500">Locations</div>
+                        </div>
+                        <div className="p-2 rounded-lg bg-zinc-800/50">
+                            <div className="text-lg font-bold text-zinc-100">
+                                {(() => {
+                                    const countries = new Set(nodes.slice(0, 200).map(n => n.country).filter(Boolean));
+                                    return countries.size;
+                                })()}
+                            </div>
+                            <div className="text-xs text-zinc-500">Countries</div>
+                        </div>
                     </div>
 
                     <div className="h-px bg-zinc-800" />
 
-                    {/* Status Breakdown */}
-                    <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-zinc-400 text-sm">Online (Public)</span>
-                            </div>
-                            <span className="font-medium text-emerald-400">{summary.online_public}</span>
+                    {/* Top Countries */}
+                    <div>
+                        <div className="text-xs text-zinc-500 mb-2">Top Countries</div>
+                        <div className="space-y-1.5">
+                            {(() => {
+                                const countryCounts = new Map<string, number>();
+                                nodes.slice(0, 200).forEach(n => {
+                                    if (n.country) {
+                                        countryCounts.set(n.country, (countryCounts.get(n.country) || 0) + 1);
+                                    }
+                                });
+                                return Array.from(countryCounts.entries())
+                                    .sort((a, b) => b[1] - a[1])
+                                    .slice(0, 5)
+                                    .map(([country, count]) => (
+                                        <div key={country} className="flex items-center justify-between text-sm">
+                                            <span className="text-zinc-300 truncate">{country}</span>
+                                            <span className="text-zinc-500 tabular-nums">{count}</span>
+                                        </div>
+                                    ));
+                            })()}
                         </div>
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-                                <span className="text-zinc-400 text-sm">Online (Private)</span>
-                            </div>
-                            <span className="font-medium text-amber-400">{summary.online_private}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-red-500" />
-                                <span className="text-zinc-400 text-sm">Offline</span>
-                            </div>
-                            <span className="font-medium text-red-400">{summary.offline}</span>
-                        </div>
-                        {summary.unknown > 0 && (
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <span className="h-2 w-2 rounded-full bg-zinc-500" />
-                                    <span className="text-zinc-400 text-sm">Unknown</span>
-                                </div>
-                                <span className="font-medium text-zinc-400">{summary.unknown}</span>
-                            </div>
-                        )}
                     </div>
 
                     <div className="h-px bg-zinc-800" />
 
-                    {/* Health Metrics */}
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                            <span className="text-zinc-500">Online Rate</span>
-                            <span className="text-zinc-200 font-medium">
-                                {((summary.online_public + summary.online_private) / summary.total * 100).toFixed(1)}%
-                            </span>
+                    {/* Version Distribution */}
+                    <div>
+                        <div className="text-xs text-zinc-500 mb-2">Version Distribution</div>
+                        <div className="space-y-1.5">
+                            {(() => {
+                                const versionCounts = new Map<string, number>();
+                                nodes.slice(0, 200).forEach(n => {
+                                    const ver = n.version || "Unknown";
+                                    versionCounts.set(ver, (versionCounts.get(ver) || 0) + 1);
+                                });
+                                return Array.from(versionCounts.entries())
+                                    .sort((a, b) => b[1] - a[1])
+                                    .slice(0, 4)
+                                    .map(([version, count]) => (
+                                        <div key={version} className="flex items-center justify-between text-sm">
+                                            <span className="text-zinc-300 font-mono text-xs">{version}</span>
+                                            <span className="text-zinc-500 tabular-nums">{count}</span>
+                                        </div>
+                                    ));
+                            })()}
                         </div>
-                        <div className="flex items-center justify-between text-sm">
-                            <span className="text-zinc-500">Public RPC Rate</span>
-                            <span className="text-zinc-200 font-medium">
-                                {(summary.online_public / summary.total * 100).toFixed(1)}%
-                            </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                            <span className="text-zinc-500">Displayed</span>
-                            <span className="text-zinc-400">
-                                {Math.min(100, nodes.length)} of {nodes.length}
-                            </span>
+                    </div>
+
+                    <div className="h-px bg-zinc-800" />
+
+                    {/* Top Cities */}
+                    <div>
+                        <div className="text-xs text-zinc-500 mb-2">Top Cities</div>
+                        <div className="space-y-1.5">
+                            {(() => {
+                                const cityCounts = new Map<string, number>();
+                                nodes.slice(0, 200).forEach(n => {
+                                    if (n.city) {
+                                        cityCounts.set(n.city, (cityCounts.get(n.city) || 0) + 1);
+                                    }
+                                });
+                                return Array.from(cityCounts.entries())
+                                    .sort((a, b) => b[1] - a[1])
+                                    .slice(0, 4)
+                                    .map(([city, count]) => (
+                                        <div key={city} className="flex items-center justify-between text-sm">
+                                            <span className="text-zinc-300 truncate">{city}</span>
+                                            <span className="text-zinc-500 tabular-nums">{count}</span>
+                                        </div>
+                                    ));
+                            })()}
                         </div>
                     </div>
                 </CardContent>
@@ -414,3 +422,4 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
         </div>
     );
 }
+
