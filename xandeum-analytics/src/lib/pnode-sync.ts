@@ -50,6 +50,8 @@ export async function syncPnodesOnce() {
   let successCount = 0;
   let failCount = 0;
 
+  const nowTimestamp = Math.floor(Date.now() / 1000);
+
   const updatePromises = Array.from(statsMap.entries()).map(
     async ([address, stats]) => {
       if (!stats) {
@@ -58,9 +60,15 @@ export async function syncPnodesOnce() {
       }
 
       try {
+        // If we successfully fetched stats, the node is definitely online
+        // Update lastSeenTimestamp to current time (not relying on stale pRPC data)
         await prisma.pNode.update({
           where: { address },
           data: {
+            // Mark as seen NOW since we successfully reached the node's RPC
+            lastSeenTimestamp: BigInt(nowTimestamp),
+            lastSeen: now,
+
             totalBytes: stats.total_bytes
               ? BigInt(stats.total_bytes)
               : undefined,
