@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { RotateCWIcon, type RotateCWIconHandle } from "@/components/ui/rotate-cw";
 import { SearchIcon } from "@/components/ui/search";
 import { DownloadIcon } from "@/components/ui/download";
+import { Status, StatusIndicator, StatusLabel } from "@/components/kibo-ui/status";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,9 +21,10 @@ interface NavbarProps {
   onRefresh?: () => void;
   onSearch?: (query: string) => void;
   onExport?: (format: "json" | "csv") => void;
+  networkStatus?: "online" | "offline" | "degraded" | "maintenance";
 }
 
-export function Navbar({ title, onRefresh, onSearch, onExport }: NavbarProps) {
+export function Navbar({ title, onRefresh, onSearch, onExport, networkStatus = "online" }: NavbarProps) {
   const [countdown, setCountdown] = useState(30);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,8 +68,13 @@ export function Navbar({ title, onRefresh, onSearch, onExport }: NavbarProps) {
   return (
     <header className="sticky top-0 z-10 w-full border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-sm">
       <div className="px-6 flex h-14 items-center justify-between gap-4">
-        <div className="flex items-center space-x-4 lg:space-x-0">
+        <div className="flex items-center space-x-4 lg:space-x-3">
           <SheetMenu />
+          <Status status={networkStatus}>
+            <StatusIndicator />
+            <StatusLabel />
+          </Status>
+          <div className="h-4 w-px bg-zinc-700 hidden lg:block" />
           <h1 className="text-lg font-semibold text-zinc-100">{title}</h1>
         </div>
 
