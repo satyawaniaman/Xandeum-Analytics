@@ -139,6 +139,8 @@ export function Navbar({ title, onRefresh, onSearch, onExport, networkStatus = "
             </Button>
           </div>
 
+
+
           <ModeToggle />
         </div>
       </div>
