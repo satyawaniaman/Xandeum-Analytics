@@ -105,9 +105,9 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
     return (
         <div className={`grid grid-cols-1 lg:grid-cols-3 gap-4 ${className}`}>
             {/* Map - 2/3 width */}
-            <Card className="lg:col-span-2 rounded-xl border border-zinc-800 bg-zinc-900/50">
+            <Card className="lg:col-span-2 rounded-xl border border-border bg-card">
                 <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                    <CardTitle className="text-sm font-medium text-zinc-400">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
                         Global Node Distribution
                     </CardTitle>
                     <div className="flex items-center gap-1">
@@ -116,11 +116,11 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                             size="sm"
                             onClick={handleZoomOut}
                             disabled={zoom <= 1}
-                            className="h-7 w-7 p-0 text-zinc-500 hover:text-zinc-300"
+                            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
                         >
                             −
                         </Button>
-                        <span className="text-xs text-zinc-500 w-12 text-center">
+                        <span className="text-xs text-muted-foreground w-12 text-center">
                             {(zoom * 100).toFixed(0)}%
                         </span>
                         <Button
@@ -128,7 +128,7 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                             size="sm"
                             onClick={handleZoomIn}
                             disabled={zoom >= 8}
-                            className="h-7 w-7 p-0 text-zinc-500 hover:text-zinc-300"
+                            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
                         >
                             +
                         </Button>
@@ -136,14 +136,14 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                             variant="ghost"
                             size="sm"
                             onClick={handleReset}
-                            className="h-7 px-2 text-xs text-zinc-500 hover:text-zinc-300"
+                            className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
                         >
                             Reset
                         </Button>
                     </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                    <div className="relative h-[420px] w-full overflow-hidden rounded-lg bg-zinc-800/50">
+                    <div className="relative h-[420px] w-full overflow-hidden rounded-lg bg-muted">
                         <ComposableMap
                             projection="geoMercator"
                             projectionConfig={{ scale: 120, center: [0, 20] }}
@@ -163,12 +163,11 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                                             <Geography
                                                 key={geo.rsmKey}
                                                 geography={geo}
-                                                fill="#3f3f46"
-                                                stroke="#52525b"
+                                                className="fill-slate-300 stroke-slate-400 dark:fill-zinc-700 dark:stroke-zinc-600"
                                                 strokeWidth={0.3}
                                                 style={{
                                                     default: { outline: "none" },
-                                                    hover: { outline: "none", fill: "#52525b" },
+                                                    hover: { outline: "none" },
                                                     pressed: { outline: "none" },
                                                 }}
                                             />
@@ -224,7 +223,7 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                         {/* Hover Tooltip */}
                         {hoveredGroup && hoveredGroup.nodes[0] && (
                             <div className="absolute bottom-3 left-3 z-50">
-                                <div className="bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl p-3 min-w-52">
+                                <div className="bg-popover border border-border rounded-lg shadow-xl p-3 min-w-52">
                                     <div className="flex items-center gap-2 mb-2">
                                         <span
                                             className="h-2 w-2 rounded-full"
@@ -236,51 +235,51 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                                                         : "#ef4444"
                                             }}
                                         />
-                                        <span className="text-sm font-medium text-zinc-200">
+                                        <span className="text-sm font-medium text-foreground">
                                             {[hoveredGroup.nodes[0].city, hoveredGroup.nodes[0].country].filter(Boolean).join(", ") || "Unknown Location"}
                                         </span>
                                     </div>
                                     <div className="space-y-1 text-xs">
                                         {/* Always show first node details */}
                                         <div className="flex justify-between gap-4">
-                                            <span className="text-zinc-500">IP</span>
-                                            <span className="text-zinc-300 font-mono text-right">
+                                            <span className="text-muted-foreground">IP</span>
+                                            <span className="text-foreground font-mono text-right">
                                                 {hoveredGroup.nodes[0].ip}
                                             </span>
                                         </div>
                                         <div className="flex justify-between gap-4">
-                                            <span className="text-zinc-500">Status</span>
-                                            <span className="text-zinc-300 capitalize">
+                                            <span className="text-muted-foreground">Status</span>
+                                            <span className="text-foreground capitalize">
                                                 {hoveredGroup.nodes[0].status.replace('_', ' ')}
                                             </span>
                                         </div>
                                         <div className="flex justify-between gap-4">
-                                            <span className="text-zinc-500">Version</span>
-                                            <span className="text-zinc-300">
+                                            <span className="text-muted-foreground">Version</span>
+                                            <span className="text-foreground">
                                                 {hoveredGroup.nodes[0].version || "—"}
                                             </span>
                                         </div>
                                         <div className="flex justify-between gap-4">
-                                            <span className="text-zinc-500">Last Seen</span>
-                                            <span className="text-zinc-300">
+                                            <span className="text-muted-foreground">Last Seen</span>
+                                            <span className="text-foreground">
                                                 {formatTimeAgo(hoveredGroup.nodes[0].lastSeenAgoSeconds)}
                                             </span>
                                         </div>
                                         {/* Cluster info if multiple nodes */}
                                         {hoveredGroup.count > 1 && (
                                             <>
-                                                <div className="h-px bg-zinc-700 my-1.5" />
+                                                <div className="h-px bg-border my-1.5" />
                                                 <div className="flex justify-between gap-4">
-                                                    <span className="text-zinc-500">Total at Location</span>
-                                                    <span className="text-zinc-300 font-medium">
+                                                    <span className="text-muted-foreground">Total at Location</span>
+                                                    <span className="text-foreground font-medium">
                                                         {hoveredGroup.count} nodes
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between gap-4">
-                                                    <span className="text-zinc-500">Online / Offline</span>
+                                                    <span className="text-muted-foreground">Online / Offline</span>
                                                     <span>
                                                         <span className="text-emerald-400">{hoveredGroup.nodes.filter(n => n.isOnline).length}</span>
-                                                        <span className="text-zinc-500"> / </span>
+                                                        <span className="text-muted-foreground"> / </span>
                                                         <span className="text-red-400">{hoveredGroup.nodes.filter(n => !n.isOnline).length}</span>
                                                     </span>
                                                 </div>
@@ -292,9 +291,9 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                         )}
 
                         {/* Location count badge */}
-                        <div className="absolute top-2 right-2 px-2 py-1 rounded-md bg-zinc-900/90 border border-zinc-700 text-xs">
-                            <span className="text-zinc-500">Locations </span>
-                            <span className="font-medium text-zinc-200">{locationGroups.length}</span>
+                        <div className="absolute top-2 right-2 px-2 py-1 rounded-md bg-popover/90 border border-border text-xs">
+                            <span className="text-muted-foreground">Locations </span>
+                            <span className="font-medium text-foreground">{locationGroups.length}</span>
                         </div>
                     </div>
 
@@ -302,50 +301,50 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                     <div className="flex gap-4 mt-3 text-xs">
                         <div className="flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                            <span className="text-zinc-500">Public RPC</span>
+                            <span className="text-muted-foreground">Public RPC</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full bg-amber-500" />
-                            <span className="text-zinc-500">Private</span>
+                            <span className="text-muted-foreground">Private</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full bg-red-500" />
-                            <span className="text-zinc-500">Offline</span>
+                            <span className="text-muted-foreground">Offline</span>
                         </div>
                     </div>
                 </CardContent>
             </Card>
 
             {/* Geographic Insights Panel - 1/3 width */}
-            <Card className="rounded-xl border border-zinc-800 bg-zinc-900/50">
+            <Card className="rounded-xl border border-border bg-card">
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-zinc-400">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
                         Geographic Insights
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {/* Coverage Stats */}
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="p-2 rounded-lg bg-zinc-800/50">
-                            <div className="text-lg font-bold text-zinc-100">{locationGroups.length}</div>
-                            <div className="text-xs text-zinc-500">Locations</div>
+                        <div className="p-2 rounded-lg bg-muted">
+                            <div className="text-lg font-bold text-foreground">{locationGroups.length}</div>
+                            <div className="text-xs text-muted-foreground">Locations</div>
                         </div>
-                        <div className="p-2 rounded-lg bg-zinc-800/50">
-                            <div className="text-lg font-bold text-zinc-100">
+                        <div className="p-2 rounded-lg bg-muted">
+                            <div className="text-lg font-bold text-foreground">
                                 {(() => {
                                     const countries = new Set(nodes.slice(0, 200).map(n => n.country).filter(Boolean));
                                     return countries.size;
                                 })()}
                             </div>
-                            <div className="text-xs text-zinc-500">Countries</div>
+                            <div className="text-xs text-muted-foreground">Countries</div>
                         </div>
                     </div>
 
-                    <div className="h-px bg-zinc-800" />
+                    <div className="h-px bg-border" />
 
                     {/* Top Countries */}
                     <div>
-                        <div className="text-xs text-zinc-500 mb-2">Top Countries</div>
+                        <div className="text-xs text-muted-foreground mb-2">Top Countries</div>
                         <div className="space-y-1.5">
                             {(() => {
                                 const countryCounts = new Map<string, number>();
@@ -359,19 +358,19 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                                     .slice(0, 5)
                                     .map(([country, count]) => (
                                         <div key={country} className="flex items-center justify-between text-sm">
-                                            <span className="text-zinc-300 truncate">{country}</span>
-                                            <span className="text-zinc-500 tabular-nums">{count}</span>
+                                            <span className="text-foreground truncate">{country}</span>
+                                            <span className="text-muted-foreground tabular-nums">{count}</span>
                                         </div>
                                     ));
                             })()}
                         </div>
                     </div>
 
-                    <div className="h-px bg-zinc-800" />
+                    <div className="h-px bg-border" />
 
                     {/* Version Distribution */}
                     <div>
-                        <div className="text-xs text-zinc-500 mb-2">Version Distribution</div>
+                        <div className="text-xs text-muted-foreground mb-2">Version Distribution</div>
                         <div className="space-y-1.5">
                             {(() => {
                                 const versionCounts = new Map<string, number>();
@@ -384,19 +383,19 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                                     .slice(0, 4)
                                     .map(([version, count]) => (
                                         <div key={version} className="flex items-center justify-between text-sm">
-                                            <span className="text-zinc-300 font-mono text-xs">{version}</span>
-                                            <span className="text-zinc-500 tabular-nums">{count}</span>
+                                            <span className="text-foreground font-mono text-xs">{version}</span>
+                                            <span className="text-muted-foreground tabular-nums">{count}</span>
                                         </div>
                                     ));
                             })()}
                         </div>
                     </div>
 
-                    <div className="h-px bg-zinc-800" />
+                    <div className="h-px bg-border" />
 
                     {/* Top Cities */}
                     <div>
-                        <div className="text-xs text-zinc-500 mb-2">Top Cities</div>
+                        <div className="text-xs text-muted-foreground mb-2">Top Cities</div>
                         <div className="space-y-1.5">
                             {(() => {
                                 const cityCounts = new Map<string, number>();
@@ -410,8 +409,8 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                                     .slice(0, 4)
                                     .map(([city, count]) => (
                                         <div key={city} className="flex items-center justify-between text-sm">
-                                            <span className="text-zinc-300 truncate">{city}</span>
-                                            <span className="text-zinc-500 tabular-nums">{count}</span>
+                                            <span className="text-foreground truncate">{city}</span>
+                                            <span className="text-muted-foreground tabular-nums">{count}</span>
                                         </div>
                                     ));
                             })()}

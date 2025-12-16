@@ -27,9 +27,9 @@ const statusConfig = {
         dotColor: "bg-red-400",
     },
     unknown: {
-        color: "bg-zinc-500",
+        color: "bg-muted-foreground",
         label: "Unknown",
-        dotColor: "bg-zinc-400",
+        dotColor: "bg-muted-foreground",
     },
 };
 
@@ -64,14 +64,14 @@ export function StatusBadge({
         <div
             className={cn(
                 "inline-flex items-center gap-2 rounded-full",
-                showLabel && "bg-zinc-800/50",
+                showLabel && "bg-muted",
                 showLabel && sizes.padding,
                 className
             )}
         >
             <span className={cn("rounded-full animate-pulse", config.dotColor, sizes.dot)} />
             {showLabel && (
-                <span className={cn("font-medium text-zinc-300", sizes.text)}>
+                <span className={cn("font-medium text-foreground", sizes.text)}>
                     {config.label}
                 </span>
             )}

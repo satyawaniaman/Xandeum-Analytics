@@ -21,7 +21,7 @@ export function ModeToggle() {
             <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                     <Button
-                        className="rounded-full w-8 h-8 bg-transparent text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+                        className="rounded-full w-8 h-8 bg-transparent text-muted-foreground hover:text-foreground hover:bg-accent"
                         variant="ghost"
                         size="icon"
                         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

@@ -10,7 +10,7 @@ export function DashboardFooter() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="border-t border-zinc-800 bg-zinc-950 py-6 mt-auto">
+        <footer className="border-t border-border bg-background py-6 mt-auto">
             <div className="container mx-auto px-4">
                 {/* Social Icons */}
                 <div className="flex justify-center gap-4 mb-4">
@@ -18,7 +18,7 @@ export function DashboardFooter() {
                         href="https://discord.gg/xandeum"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
+                        className="p-2 rounded-full bg-muted hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <DiscordIcon size={20} />
                     </Link>
@@ -26,7 +26,7 @@ export function DashboardFooter() {
                         href="https://twitter.com/xandeum"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
+                        className="p-2 rounded-full bg-muted hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <TwitterIcon size={20} />
                     </Link>
@@ -34,22 +34,22 @@ export function DashboardFooter() {
                         href="https://github.com/xandeum"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
+                        className="p-2 rounded-full bg-muted hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <GithubIcon size={20} />
                     </Link>
                 </div>
 
                 {/* Copyright and Links */}
-                <div className="flex flex-col items-center gap-2 text-xs text-zinc-500">
+                <div className="flex flex-col items-center gap-2 text-xs text-muted-foreground">
                     <div className="flex items-center gap-2">
                         <span>© {currentYear} Xandeum</span>
-                        <span className="text-zinc-700">|</span>
-                        <Link href="/terms" className="hover:text-zinc-300 transition-colors">
+                        <span className="text-border">|</span>
+                        <Link href="/terms" className="hover:text-foreground transition-colors">
                             Terms
                         </Link>
-                        <span className="text-zinc-700">|</span>
-                        <Link href="/privacy" className="hover:text-zinc-300 transition-colors">
+                        <span className="text-border">|</span>
+                        <Link href="/privacy" className="hover:text-foreground transition-colors">
                             Privacy Policy
                         </Link>
                     </div>
@@ -59,15 +59,15 @@ export function DashboardFooter() {
                         href="https://docs.xandeum.network/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-zinc-400 hover:text-zinc-200 transition-colors"
+                        className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <ExternalLink className="h-3 w-3" />
                         <span>Read the Docs</span>
                     </Link>
 
                     {/* Powered By */}
-                    <div className="mt-1 text-zinc-600">
-                        Powered by <span className="text-zinc-400 font-medium">Solana</span>
+                    <div className="mt-1 text-muted-foreground/70">
+                        Powered by <span className="text-muted-foreground font-medium">Solana</span>
                     </div>
                 </div>
             </div>

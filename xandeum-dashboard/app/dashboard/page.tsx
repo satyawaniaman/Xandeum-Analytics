@@ -33,19 +33,19 @@ export default function DashboardPage() {
                     {/* KPI Cards Skeleton */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                         {[...Array(5)].map((_, i) => (
-                            <Skeleton key={i} className="h-28 rounded-xl bg-zinc-800/50" />
+                            <Skeleton key={i} className="h-28 rounded-xl bg-muted" />
                         ))}
                     </div>
                     {/* Map Skeleton */}
-                    <Skeleton className="h-72 rounded-xl bg-zinc-800/50" />
+                    <Skeleton className="h-72 rounded-xl bg-muted" />
                     {/* Charts Skeleton */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <Skeleton className="h-64 rounded-xl bg-zinc-800/50" />
-                        <Skeleton className="h-64 rounded-xl bg-zinc-800/50" />
-                        <Skeleton className="h-64 rounded-xl bg-zinc-800/50" />
+                        <Skeleton className="h-64 rounded-xl bg-muted" />
+                        <Skeleton className="h-64 rounded-xl bg-muted" />
+                        <Skeleton className="h-64 rounded-xl bg-muted" />
                     </div>
                     {/* Table Skeleton */}
-                    <Skeleton className="h-80 rounded-xl bg-zinc-800/50" />
+                    <Skeleton className="h-80 rounded-xl bg-muted" />
                 </div>
             </ContentLayout>
         );
@@ -58,10 +58,10 @@ export default function DashboardPage() {
                     <div className="text-red-400 mb-4">
                         <MonitorCheckIcon size={48} />
                     </div>
-                    <h2 className="text-xl font-semibold text-zinc-200 mb-2">
+                    <h2 className="text-xl font-semibold text-foreground mb-2">
                         Failed to load dashboard data
                     </h2>
-                    <p className="text-zinc-500 max-w-md">
+                    <p className="text-muted-foreground max-w-md">
                         {error.message || "Unable to connect to the API. Please check your connection and try again."}
                     </p>
                 </div>

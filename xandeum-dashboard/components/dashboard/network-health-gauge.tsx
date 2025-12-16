@@ -45,9 +45,9 @@ export function NetworkHealthGauge({
     };
 
     return (
-        <Card className={`rounded-xl border border-zinc-800 bg-zinc-900/50 ${className}`}>
+        <Card className={`rounded-xl border border-border bg-card ${className}`}>
             <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-zinc-400">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                     Network Health
                 </CardTitle>
             </CardHeader>
@@ -60,22 +60,22 @@ export function NetworkHealthGauge({
                     gap={4}
                     thickness={8}
                     activeColor={getHealthColor(healthScore)}
-                    inactiveColor="bg-zinc-800"
+                    inactiveColor="bg-muted"
                     showValue={true}
                     label={getHealthLabel(healthScore)}
                 />
-                <div className="flex justify-between w-full mt-4 pt-4 border-t border-zinc-800 text-sm">
+                <div className="flex justify-between w-full mt-4 pt-4 border-t border-border text-sm">
                     <div className="text-center">
-                        <p className="text-zinc-500">Online</p>
-                        <p className="text-zinc-200 font-medium">{onlinePercent.toFixed(0)}%</p>
+                        <p className="text-muted-foreground">Online</p>
+                        <p className="text-foreground font-medium">{onlinePercent.toFixed(0)}%</p>
                     </div>
                     <div className="text-center">
-                        <p className="text-zinc-500">Public RPC</p>
-                        <p className="text-zinc-200 font-medium">{publicPercent.toFixed(0)}%</p>
+                        <p className="text-muted-foreground">Public RPC</p>
+                        <p className="text-foreground font-medium">{publicPercent.toFixed(0)}%</p>
                     </div>
                     <div className="text-center">
-                        <p className="text-zinc-500">Quality</p>
-                        <p className="text-zinc-200 font-medium">{connectivityQuality.toFixed(0)}%</p>
+                        <p className="text-muted-foreground">Quality</p>
+                        <p className="text-foreground font-medium">{connectivityQuality.toFixed(0)}%</p>
                     </div>
                 </div>
             </CardContent>

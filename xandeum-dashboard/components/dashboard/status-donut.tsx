@@ -32,9 +32,9 @@ export function StatusDonut({ summary, className }: StatusDonutProps) {
     ].filter(item => item.value > 0);
 
     return (
-        <Card className={`rounded-xl border border-zinc-800 bg-zinc-900/50 ${className}`}>
+        <Card className={`rounded-xl border border-border bg-card ${className}`}>
             <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-zinc-400">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                     Status Distribution
                 </CardTitle>
             </CardHeader>
@@ -77,8 +77,8 @@ export function StatusDonut({ summary, className }: StatusDonutProps) {
                                     className="h-3 w-3 rounded-full"
                                     style={{ backgroundColor: COLORS[item.key as keyof typeof COLORS] }}
                                 />
-                                <span className="text-sm text-zinc-400">{item.name}</span>
-                                <span className="ml-auto text-sm font-medium text-zinc-200">
+                                <span className="text-sm text-muted-foreground">{item.name}</span>
+                                <span className="ml-auto text-sm font-medium text-foreground">
                                     {item.value}
                                 </span>
                             </div>

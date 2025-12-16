@@ -51,13 +51,13 @@ export function MiniNodesTable({ nodes, className, showAll = false }: MiniNodesT
     const displayNodes = showAll ? sortedNodes : sortedNodes.slice(0, 10);
 
     return (
-        <Card className={`rounded-xl border border-zinc-800 bg-zinc-900/50 ${className}`}>
+        <Card className={`rounded-xl border border-border bg-card ${className}`}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-zinc-400">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                     {showAll ? "All pNodes" : "Top pNodes"}
                 </CardTitle>
                 {!showAll && (
-                    <Button variant="ghost" size="sm" asChild className="text-zinc-500 hover:text-zinc-300">
+                    <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
                         <Link href="/dashboard/nodes">View All →</Link>
                     </Button>
                 )}
@@ -66,36 +66,36 @@ export function MiniNodesTable({ nodes, className, showAll = false }: MiniNodesT
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader>
-                            <TableRow className="border-zinc-800 hover:bg-transparent">
-                                <TableHead className="text-zinc-500 min-w-[120px]">Status</TableHead>
-                                <TableHead className="text-zinc-500 min-w-[140px]">Address</TableHead>
-                                <TableHead className="text-zinc-500">Version</TableHead>
-                                <TableHead className="text-zinc-500 text-right">CPU</TableHead>
-                                <TableHead className="text-zinc-500 text-right">RAM</TableHead>
-                                <TableHead className="text-zinc-500 text-right">Storage</TableHead>
-                                <TableHead className="text-zinc-500 text-right">Uptime</TableHead>
-                                <TableHead className="text-zinc-500 text-right min-w-[90px]">Last Seen</TableHead>
+                            <TableRow className="border-border hover:bg-transparent">
+                                <TableHead className="text-muted-foreground min-w-[120px]">Status</TableHead>
+                                <TableHead className="text-muted-foreground min-w-[140px]">Address</TableHead>
+                                <TableHead className="text-muted-foreground">Version</TableHead>
+                                <TableHead className="text-muted-foreground text-right">CPU</TableHead>
+                                <TableHead className="text-muted-foreground text-right">RAM</TableHead>
+                                <TableHead className="text-muted-foreground text-right">Storage</TableHead>
+                                <TableHead className="text-muted-foreground text-right">Uptime</TableHead>
+                                <TableHead className="text-muted-foreground text-right min-w-[90px]">Last Seen</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {displayNodes.map((node) => (
                                 <TableRow
                                     key={node.id}
-                                    className="border-zinc-800 hover:bg-zinc-800/50 cursor-pointer"
+                                    className="border-border hover:bg-muted cursor-pointer"
                                 >
                                     <TableCell>
                                         <StatusBadge status={node.status} showLabel={true} size="sm" />
                                     </TableCell>
-                                    <TableCell className="font-mono text-sm text-zinc-300">
+                                    <TableCell className="font-mono text-sm text-foreground">
                                         <Link
                                             href={`/dashboard/nodes/${encodeURIComponent(node.address)}`}
-                                            className="hover:text-zinc-100 hover:underline"
+                                            className="hover:text-foreground hover:underline"
                                         >
                                             {node.ip}
-                                            {node.port && <span className="text-zinc-600">:{node.port}</span>}
+                                            {node.port && <span className="text-muted-foreground/50">:{node.port}</span>}
                                         </Link>
                                     </TableCell>
-                                    <TableCell className="text-zinc-400 text-sm">
+                                    <TableCell className="text-muted-foreground text-sm">
                                         {node.version || "—"}
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -111,7 +111,7 @@ export function MiniNodesTable({ nodes, className, showAll = false }: MiniNodesT
                                                 }
                                             </span>
                                         ) : (
-                                            <span className="text-zinc-600">—</span>
+                                            <span className="text-muted-foreground">—</span>
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -124,7 +124,7 @@ export function MiniNodesTable({ nodes, className, showAll = false }: MiniNodesT
                                                 {node.ramUsagePercent.toFixed(0)}%
                                             </span>
                                         ) : (
-                                            <span className="text-zinc-600">—</span>
+                                            <span className="text-muted-foreground">—</span>
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -146,20 +146,20 @@ export function MiniNodesTable({ nodes, className, showAll = false }: MiniNodesT
                                                 </span>
                                             )
                                         ) : (
-                                            <span className="text-zinc-600">—</span>
+                                            <span className="text-muted-foreground">—</span>
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-right text-zinc-400 text-sm">
+                                    <TableCell className="text-right text-muted-foreground text-sm">
                                         {formatUptime(node.uptimeHuman)}
                                     </TableCell>
-                                    <TableCell className="text-right text-zinc-500 text-sm">
+                                    <TableCell className="text-right text-muted-foreground text-sm">
                                         {formatTimeAgo(node.lastSeenAgoSeconds)}
                                     </TableCell>
                                 </TableRow>
                             ))}
                             {displayNodes.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center text-zinc-500 py-8">
+                                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                                         No nodes available
                                     </TableCell>
                                 </TableRow>
@@ -168,8 +168,8 @@ export function MiniNodesTable({ nodes, className, showAll = false }: MiniNodesT
                     </Table>
                 </div>
                 {!showAll && nodes.length > 10 && (
-                    <div className="flex justify-center py-3 border-t border-zinc-800">
-                        <span className="text-xs text-zinc-500">
+                    <div className="flex justify-center py-3 border-t border-border">
+                        <span className="text-xs text-muted-foreground">
                             Showing 10 of {nodes.length} nodes
                         </span>
                     </div>

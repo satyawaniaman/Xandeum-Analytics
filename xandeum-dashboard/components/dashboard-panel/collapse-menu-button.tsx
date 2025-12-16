@@ -115,7 +115,7 @@ export function CollapseMenuButton({
                         asChild
                     >
                         <Link href={href}>
-                            <span className="mr-4 ml-2 w-1 h-1 rounded-full bg-zinc-500" />
+                            <span className="mr-4 ml-2 w-1 h-1 rounded-full bg-muted-foreground" />
                             <p
                                 className={cn(
                                     "max-w-[170px] truncate",

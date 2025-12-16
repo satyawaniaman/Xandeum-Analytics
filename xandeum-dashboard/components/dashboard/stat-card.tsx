@@ -18,17 +18,17 @@ interface StatCardProps {
 }
 
 const variantStyles = {
-    default: "border-zinc-800 bg-zinc-900/50",
-    success: "border-emerald-800/50 bg-emerald-950/30",
-    warning: "border-amber-800/50 bg-amber-950/30",
-    danger: "border-red-800/50 bg-red-950/30",
+    default: "border-border bg-card",
+    success: "border-emerald-500/30 bg-emerald-500/10 dark:border-emerald-800/50 dark:bg-emerald-950/30",
+    warning: "border-amber-500/30 bg-amber-500/10 dark:border-amber-800/50 dark:bg-amber-950/30",
+    danger: "border-red-500/30 bg-red-500/10 dark:border-red-800/50 dark:bg-red-950/30",
 };
 
 const valueStyles = {
-    default: "text-zinc-100",
-    success: "text-emerald-400",
-    warning: "text-amber-400",
-    danger: "text-red-400",
+    default: "text-foreground",
+    success: "text-emerald-600 dark:text-emerald-400",
+    warning: "text-amber-600 dark:text-amber-400",
+    danger: "text-red-600 dark:text-red-400",
 };
 
 export function StatCard({
@@ -44,8 +44,8 @@ export function StatCard({
         <Card className={cn("rounded-xl border", variantStyles[variant], className)}>
             <CardContent className="p-6">
                 <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-zinc-400">{title}</p>
-                    {icon && <div className="text-zinc-500">{icon}</div>}
+                    <p className="text-sm font-medium text-muted-foreground">{title}</p>
+                    {icon && <div className="text-muted-foreground">{icon}</div>}
                 </div>
                 <div className="mt-3 flex items-baseline gap-2">
                     <span className={cn("text-3xl font-bold", valueStyles[variant])}>
@@ -63,7 +63,7 @@ export function StatCard({
                     )}
                 </div>
                 {subtitle && (
-                    <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
                 )}
             </CardContent>
         </Card>

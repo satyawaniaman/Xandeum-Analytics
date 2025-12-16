@@ -15,7 +15,7 @@ export function Sidebar() {
     return (
         <aside
             className={cn(
-                "fixed top-0 left-0 z-20 h-screen -translate-x-full lg:translate-x-0 transition-[width] ease-in-out duration-300 bg-zinc-900/50 border-r border-zinc-800",
+                "fixed top-0 left-0 z-20 h-screen -translate-x-full lg:translate-x-0 transition-[width] ease-in-out duration-300 bg-sidebar border-r border-border",
                 !getOpenState() ? "w-[90px]" : "w-72",
                 settings.disabled && "hidden"
             )}
@@ -43,7 +43,7 @@ export function Sidebar() {
                         />
                         <h1
                             className={cn(
-                                "font-semibold text-base whitespace-nowrap text-zinc-100 transition-[transform,opacity,display] ease-in-out duration-300",
+                                "font-semibold text-base whitespace-nowrap text-foreground transition-[transform,opacity,display] ease-in-out duration-300",
                                 !getOpenState()
                                     ? "-translate-x-96 opacity-0 hidden"
                                     : "translate-x-0 opacity-100"

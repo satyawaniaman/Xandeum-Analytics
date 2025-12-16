@@ -9,7 +9,7 @@ interface ContentLayoutProps {
 
 export function ContentLayout({ title, children, onRefresh, networkStatus }: ContentLayoutProps) {
   return (
-    <div className="bg-zinc-950 min-h-screen">
+    <div className="bg-background min-h-screen">
       <Navbar title={title} onRefresh={onRefresh} networkStatus={networkStatus} />
       <div className="px-6 py-6">{children}</div>
     </div>

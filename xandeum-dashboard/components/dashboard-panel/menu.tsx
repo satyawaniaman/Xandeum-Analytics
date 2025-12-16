@@ -35,7 +35,7 @@ export function Menu({ isOpen }: MenuProps) {
                 </p>
               ) : groupLabel ? (
                 <div className="px-3 pb-2 pt-1">
-                  <div className="h-px w-full bg-zinc-700" />
+                  <div className="h-px w-full bg-border" />
                 </div>
               ) : null}
               {menus.map(

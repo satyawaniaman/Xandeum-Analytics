@@ -20,7 +20,7 @@ export function SheetMenu() {
           <MenuIcon size={20} />
         </Button>
       </SheetTrigger>
-      <SheetContent className="sm:w-72 px-3 h-full flex flex-col bg-zinc-900 border-zinc-800" side="left">
+      <SheetContent className="sm:w-72 px-3 h-full flex flex-col bg-card border-border" side="left">
         <SheetHeader>
           <Button
             className="flex justify-center items-center pb-2 pt-1"
@@ -34,7 +34,7 @@ export function SheetMenu() {
                 width={28}
                 height={28}
               />
-              <SheetTitle className="font-semibold text-base text-zinc-100">Xandeum Analytics</SheetTitle>
+              <SheetTitle className="font-semibold text-base text-foreground">Xandeum Analytics</SheetTitle>
             </Link>
           </Button>
         </SheetHeader>

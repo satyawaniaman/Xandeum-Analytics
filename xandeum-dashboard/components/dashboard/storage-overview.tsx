@@ -43,28 +43,28 @@ export function StorageOverview({ nodes, className }: StorageOverviewProps) {
         totalCapacity > 0 ? (totalUsed / totalCapacity) * 100 : 0;
 
     return (
-        <Card className={`rounded-xl border border-zinc-800 bg-zinc-900/50 ${className}`}>
+        <Card className={`rounded-xl border border-border bg-card ${className}`}>
             <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-zinc-400">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                     Storage Overview
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                        <span className="text-zinc-400">Total Capacity</span>
-                        <span className="font-medium text-zinc-200">
+                        <span className="text-muted-foreground">Total Capacity</span>
+                        <span className="font-medium text-foreground">
                             {formatBytes(totalCapacity)}
                         </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                        <span className="text-zinc-400">Used Storage</span>
-                        <span className="font-medium text-zinc-200">
+                        <span className="text-muted-foreground">Used Storage</span>
+                        <span className="font-medium text-foreground">
                             {formatBytes(totalUsed)}
                         </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                        <span className="text-zinc-400">Available</span>
+                        <span className="text-muted-foreground">Available</span>
                         <span className="font-medium text-emerald-400">
                             {formatBytes(totalCapacity - totalUsed)}
                         </span>
@@ -73,27 +73,27 @@ export function StorageOverview({ nodes, className }: StorageOverviewProps) {
 
                 <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                        <span className="text-zinc-400">Network Utilization</span>
-                        <span className="font-medium text-zinc-200">
+                        <span className="text-muted-foreground">Network Utilization</span>
+                        <span className="font-medium text-foreground">
                             {overallUtilization.toFixed(1)}%
                         </span>
                     </div>
                     <Progress
                         value={overallUtilization}
-                        className="h-2 bg-zinc-800"
+                        className="h-2 bg-muted"
                     />
                 </div>
 
-                <div className="pt-2 border-t border-zinc-800">
+                <div className="pt-2 border-t border-border">
                     <div className="flex justify-between text-sm">
-                        <span className="text-zinc-500">Nodes with storage data</span>
-                        <span className="text-zinc-400">
+                        <span className="text-muted-foreground">Nodes with storage data</span>
+                        <span className="text-muted-foreground">
                             {nodesWithStorage.length} of {nodes.length}
                         </span>
                     </div>
                     <div className="flex justify-between text-sm mt-1">
-                        <span className="text-zinc-500">Avg. utilization per node</span>
-                        <span className="text-zinc-400">
+                        <span className="text-muted-foreground">Avg. utilization per node</span>
+                        <span className="text-muted-foreground">
                             {avgUtilization.toFixed(1)}%
                         </span>
                     </div>

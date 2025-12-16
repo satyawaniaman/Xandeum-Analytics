@@ -15,7 +15,7 @@ export default function AdminPanelLayout({
     if (!sidebar) return null;
     const { getOpenState, settings } = sidebar;
     return (
-        <div className="min-h-screen bg-zinc-950 flex flex-col">
+        <div className="min-h-screen bg-background flex flex-col">
             <Sidebar />
             <main
                 className={cn(
