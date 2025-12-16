@@ -10,13 +10,14 @@ datasource db {
 
 model PNode {
   id                String    @id @default(uuid())
-  address           String    @unique
+  ip                String    @unique  // Changed: IP is now the unique identifier
+  address           String              // Full address (IP:port) - kept for reference, not unique
   pubkey            String?
   version           String?
   lastSeenTimestamp BigInt?
   lastSeen          DateTime?
   createdAt         DateTime  @default(now())
-  updatedAt         DateTime
+  updatedAt         DateTime  @updatedAt
   activeStreams     Int?
   cpuPercent        Float?
   fileSizeBytes     BigInt?
@@ -38,4 +39,5 @@ model PNode {
   @@index([cpuPercent])
   @@index([lastSeenTimestamp])
   @@index([version])
+  @@index([address])
 }

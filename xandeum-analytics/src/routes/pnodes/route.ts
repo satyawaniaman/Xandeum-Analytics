@@ -118,7 +118,7 @@ function mapNodeToDetailDto(node: PNode) {
     // identity
     id: node.id,
     address: node.address,
-    ip: node.address.split(":")[0],
+    ip: node.ip,
     port: node.address.split(":")[1] ?? null,
     pubkey: node.pubkey,
     version: node.version,
@@ -265,15 +265,14 @@ app.get("/stats", async (c) => {
 });
 
 /**
- * GET /pnodes/:address
- * Get detailed information for a specific pNode.
- * Address should be URL-encoded (e.g., 192.168.1.1%3A9001)
+ * GET /pnodes/:ip
+ * Get detailed information for a specific pNode by IP.
  */
-app.get("/:address", async (c) => {
+app.get("/:ip", async (c) => {
   try {
-    const addressParam = c.req.param("address");
-    const decodedAddress = decodeURIComponent(addressParam);
-    const cacheKey = `pnode:${decodedAddress}:v3`;
+    const ipParam = c.req.param("ip");
+    const decodedIp = decodeURIComponent(ipParam);
+    const cacheKey = `pnode:${decodedIp}:v4`;
 
     // Try cache first
     const cached = await redis.get(cacheKey);
@@ -283,9 +282,9 @@ app.get("/:address", async (c) => {
       return c.json(parsedCache);
     }
 
-    // Query database
+    // Query database by IP
     const node = await prisma.pNode.findUnique({
-      where: { address: decodedAddress },
+      where: { ip: decodedIp },
     });
 
     if (!node) {
@@ -340,6 +339,96 @@ app.post("/sync", async (c) => {
     return c.json(
       {
         error: "Sync failed",
+        message: err instanceof Error ? err.message : "Unknown error",
+      },
+      500,
+    );
+  }
+});
+
+/**
+ * POST /pnodes/cleanup
+ * Manually cleanup stale nodes from the database.
+ * Protected with Bearer token authentication.
+ * 
+ * Query params:
+ * - days: number of days to consider a node stale (default: 7)
+ * - dryRun: if "true", only report what would be deleted without actually deleting
+ */
+app.post("/cleanup", async (c) => {
+  try {
+    // Check for authentication token
+    const authHeader = c.req.header("Authorization");
+    const syncToken = process.env.SYNC_TOKEN;
+
+    if (syncToken) {
+      if (!authHeader || authHeader !== `Bearer ${syncToken}`) {
+        logger.warn("Unauthorized cleanup attempt");
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+    }
+
+    const daysParam = c.req.query("days");
+    const dryRun = c.req.query("dryRun") === "true";
+    const retentionDays = daysParam ? parseInt(daysParam, 10) : 7;
+
+    if (isNaN(retentionDays) || retentionDays < 1) {
+      return c.json({ error: "Invalid days parameter" }, 400);
+    }
+
+    logger.info({ retentionDays, dryRun }, "Manual cleanup triggered");
+
+    // Find stale nodes
+    const staleThreshold = new Date();
+    staleThreshold.setDate(staleThreshold.getDate() - retentionDays);
+
+    const staleNodes = await prisma.pNode.findMany({
+      where: {
+        updatedAt: { lt: staleThreshold },
+      },
+      select: { address: true, updatedAt: true },
+    });
+
+    if (dryRun) {
+      return c.json({
+        ok: true,
+        dryRun: true,
+        wouldDelete: staleNodes.length,
+        retentionDays,
+        staleThreshold: staleThreshold.toISOString(),
+        nodes: staleNodes.slice(0, 20).map((n) => ({
+          address: n.address,
+          updatedAt: n.updatedAt.toISOString(),
+        })),
+        message: `Would delete ${staleNodes.length} nodes not updated in ${retentionDays} days`,
+      });
+    }
+
+    // Actually delete
+    const deleteResult = await prisma.pNode.deleteMany({
+      where: {
+        address: { in: staleNodes.map((n) => n.address) },
+      },
+    });
+
+    // Invalidate caches
+    await redis.del("pnodes:list:v3");
+    await redis.del("pnodes:stats:v1");
+
+    logger.info({ deleted: deleteResult.count }, "Cleanup completed");
+
+    return c.json({
+      ok: true,
+      deleted: deleteResult.count,
+      retentionDays,
+      timestamp: new Date().toISOString(),
+      message: `Deleted ${deleteResult.count} stale nodes`,
+    });
+  } catch (err) {
+    logger.error({ err }, "Cleanup failed");
+    return c.json(
+      {
+        error: "Cleanup failed",
         message: err instanceof Error ? err.message : "Unknown error",
       },
       500,

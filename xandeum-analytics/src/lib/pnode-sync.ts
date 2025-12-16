@@ -4,6 +4,9 @@ import logger from "./loggin-client";
 import { batchGetStats, extractIpFromAddress } from "./pnode-stats-client";
 import { batchGetGeoLocation } from "./geo-client";
 
+// How long to keep nodes that are no longer returned by pRPC (in days)
+const STALE_NODE_RETENTION_DAYS = 7;
+
 export async function syncPnodesOnce() {
   const startTime = Date.now();
   const pods = await getPods();
@@ -14,57 +17,81 @@ export async function syncPnodesOnce() {
     return;
   }
 
-  logger.info(`Syncing ${pods.length} pods base info...`);
+  logger.info(`Syncing ${pods.length} pods from pRPC...`);
 
-  // 1) Upsert base info from get-pods
+  // Deduplicate pods by IP - keep the one with the most recent last_seen_timestamp
+  const podsByIp = new Map<string, (typeof pods)[0]>();
+  for (const pod of pods) {
+    const ip = extractIpFromAddress(pod.address);
+    const existing = podsByIp.get(ip);
+
+    if (!existing) {
+      podsByIp.set(ip, pod);
+    } else {
+      // Keep the pod with the more recent timestamp
+      const existingTs = existing.last_seen_timestamp ?? 0;
+      const newTs = pod.last_seen_timestamp ?? 0;
+      if (newTs > existingTs) {
+        podsByIp.set(ip, pod);
+      }
+    }
+  }
+
+  const uniquePods = Array.from(podsByIp.values());
+  logger.info(`Deduplicated to ${uniquePods.length} unique IPs (from ${pods.length} addresses)`);
+
+  // Track current IPs for cleanup later
+  const currentIps = new Set(uniquePods.map((pod) => extractIpFromAddress(pod.address)));
+
+  // 1) Upsert base info from get-pods - keyed by IP
   await prisma.$transaction(
-    pods.map((pod) =>
-      prisma.pNode.upsert({
-        where: { address: pod.address },
+    uniquePods.map((pod) => {
+      const ip = extractIpFromAddress(pod.address);
+      return prisma.pNode.upsert({
+        where: { ip },
         update: {
+          address: pod.address,  // Update to latest address (IP:port)
           pubkey: pod.pubkey ?? undefined,
           version: pod.version ?? undefined,
           lastSeenTimestamp: pod.last_seen_timestamp ?? undefined,
           lastSeen: pod.last_seen ? new Date(pod.last_seen) : undefined,
-          updatedAt: now,
         },
         create: {
+          ip,
           address: pod.address,
           pubkey: pod.pubkey ?? undefined,
           version: pod.version ?? undefined,
           lastSeenTimestamp: pod.last_seen_timestamp ?? undefined,
           lastSeen: pod.last_seen ? new Date(pod.last_seen) : undefined,
-          createdAt: now,
-          updatedAt: now,
         },
-      }),
-    ),
+      });
+    }),
   );
 
   logger.info("Base pod info synced. Fetching detailed stats in parallel...");
 
   // 2) Fetch stats for all pods in parallel with concurrency limit
-  const addresses = pods.map((pod) => pod.address);
+  // Use the addresses from uniquePods (one per IP)
+  const addresses = uniquePods.map((pod) => pod.address);
   const statsMap = await batchGetStats(addresses, 15); // 15 concurrent requests
 
   // 3) Fetch geolocation for IPs that don't have it yet
   const nodesWithoutGeo = await prisma.pNode.findMany({
     where: { latitude: null },
-    select: { address: true },
+    select: { ip: true },
   });
 
   if (nodesWithoutGeo.length > 0) {
     logger.info(`Fetching geolocation for ${nodesWithoutGeo.length} nodes...`);
-    const ipsToGeolocate = nodesWithoutGeo.map((n) => extractIpFromAddress(n.address));
+    const ipsToGeolocate = nodesWithoutGeo.map((n) => n.ip);
     const geoMap = await batchGetGeoLocation(ipsToGeolocate, 5);
 
     // Update nodes with geolocation data
     for (const node of nodesWithoutGeo) {
-      const ip = extractIpFromAddress(node.address);
-      const geo = geoMap.get(ip);
+      const geo = geoMap.get(node.ip);
       if (geo) {
         await prisma.pNode.update({
-          where: { address: node.address },
+          where: { ip: node.ip },
           data: {
             latitude: geo.latitude,
             longitude: geo.longitude,
@@ -90,12 +117,15 @@ export async function syncPnodesOnce() {
         return;
       }
 
+      const ip = extractIpFromAddress(address);
+
       try {
         // If we successfully fetched stats, the node is definitely online
         // Update lastSeenTimestamp to current time (not relying on stale pRPC data)
         await prisma.pNode.update({
-          where: { address },
+          where: { ip },
           data: {
+            address,  // Update to the address we successfully contacted
             // Mark as seen NOW since we successfully reached the node's RPC
             lastSeenTimestamp: BigInt(nowTimestamp),
             lastSeen: now,
@@ -123,7 +153,7 @@ export async function syncPnodesOnce() {
         });
         successCount++;
       } catch (err) {
-        logger.warn({ address, err }, "Failed to update stats for node");
+        logger.warn({ ip, address, err }, "Failed to update stats for node");
         failCount++;
       }
     },
@@ -131,14 +161,41 @@ export async function syncPnodesOnce() {
 
   await Promise.all(updatePromises);
 
+  // 5) Cleanup stale nodes that are no longer in pRPC response
+  //    and haven't been updated in STALE_NODE_RETENTION_DAYS
+  const staleThreshold = new Date();
+  staleThreshold.setDate(staleThreshold.getDate() - STALE_NODE_RETENTION_DAYS);
+
+  const staleNodes = await prisma.pNode.findMany({
+    where: {
+      ip: { notIn: Array.from(currentIps) },
+      updatedAt: { lt: staleThreshold },
+    },
+    select: { ip: true },
+  });
+
+  if (staleNodes.length > 0) {
+    logger.info(`Removing ${staleNodes.length} stale nodes not seen in ${STALE_NODE_RETENTION_DAYS} days...`);
+
+    const deleteResult = await prisma.pNode.deleteMany({
+      where: {
+        ip: { in: staleNodes.map((n) => n.ip) },
+      },
+    });
+
+    logger.info(`Deleted ${deleteResult.count} stale nodes`);
+  }
+
   const duration = Date.now() - startTime;
-  const successRate = ((successCount / pods.length) * 100).toFixed(1);
+  const successRate = ((successCount / uniquePods.length) * 100).toFixed(1);
 
   logger.info(
     {
-      total: pods.length,
+      totalFromPrpc: pods.length,
+      uniqueIps: uniquePods.length,
       success: successCount,
       failed: failCount,
+      staleRemoved: staleNodes.length,
       successRate: `${successRate}%`,
       durationMs: duration,
     },
