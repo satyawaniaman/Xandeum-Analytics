@@ -10,8 +10,8 @@ import { WalletModalProvider } from "@solana/wallet-adapter-react-ui"
 import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets"
 import { clusterApiUrl } from "@solana/web3.js"
 
-// Note: Wallet adapter CSS removed to prevent theme conflicts
-// The app uses its own shadcn styling instead
+// Import wallet adapter CSS for modal styling
+import "@solana/wallet-adapter-react-ui/styles.css"
 
 // Context for sharing endpoint with other components (for Jupiter API etc)
 interface ModalContextState {
