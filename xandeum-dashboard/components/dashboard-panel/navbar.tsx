@@ -125,7 +125,7 @@ export function Navbar({ title, onRefresh, onSearch, onExport, networkStatus = "
           <div className="flex items-center rounded-lg border border-border bg-muted">
             <div className="flex items-center gap-2 px-3 py-1.5 text-sm">
               <span className="text-muted-foreground hidden sm:inline">Next refresh</span>
-              <span className="font-mono font-medium text-foreground tabular-nums">{countdown}s</span>
+              <span className="font-mono font-medium text-foreground tabular-nums min-w-[2.5ch] text-right">{countdown}s</span>
             </div>
             <div className="h-6 w-px bg-border" />
             <Button

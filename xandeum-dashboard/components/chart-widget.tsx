@@ -22,7 +22,7 @@ export const PriceChartWidget = () => {
 
         // Theme-aware colors
         const isDark = resolvedTheme === 'dark';
-        const backgroundColor = isDark ? '#101013' : '#ffffff';
+        const backgroundColor = isDark ? '#171717' : '#ffffff';
         const gridColor = isDark ? '#1c1c1f' : '#e5e7eb';
         const textColor = isDark ? '#9f9fa9' : '#374151';
 
