@@ -2,7 +2,7 @@ import { source } from '@/lib/source';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import { baseOptions } from '@/lib/layout.shared';
-import type { ReactNode } from 'react';
+import type { ReactNode, CSSProperties } from 'react';
 import Link from 'next/link';
 
 function DocsFooter() {
@@ -43,31 +43,25 @@ function DocsFooter() {
     );
 }
 
-import { ExternalLink, LayoutDashboard } from "lucide-react";
+
+
+import { GeistSans } from 'geist/font/sans';
 
 export default function Layout({ children }: { children: ReactNode }) {
     return (
-        <RootProvider>
-            <DocsLayout
-                tree={source.pageTree}
-                {...baseOptions()}
-                sidebar={{
-                    defaultOpenLevel: 1,
-                    banner: (
-                        <Link
-                            href="/dashboard"
-                            className="flex items-center gap-2 rounded-lg bg-secondary/50 p-2 text-sm font-medium hover:bg-secondary transition-colors mb-4 text-primary group"
-                        >
-                            <LayoutDashboard className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                            <span>Dashboard</span>
-                            <ExternalLink className="size-3 ml-auto text-muted-foreground/50 group-hover:text-primary transition-colors" />
-                        </Link>
-                    )
-                }}
-            >
-                {children}
-            </DocsLayout>
-            <DocsFooter />
-        </RootProvider>
+        <div className={GeistSans.className} style={{ '--font-sans': GeistSans.style.fontFamily } as CSSProperties}>
+            <RootProvider>
+                <DocsLayout
+                    tree={source.pageTree}
+                    {...baseOptions()}
+                    sidebar={{
+                        defaultOpenLevel: 1,
+                    }}
+                >
+                    {children}
+                </DocsLayout>
+                <DocsFooter />
+            </RootProvider>
+        </div>
     );
 }

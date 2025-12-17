@@ -15,7 +15,16 @@ We utilize the **Jupiter V6/Ultra API** to fetch the most efficient swap routes.
 - **Smart Routing**: Trades may be split across multiple pools to minimize price impact and slippage.
 
 ### Fee Structure
-- **Platform Fee**: A 0.20% (20 BPS) platform fee is applied to swaps executed through the dashboard.
+<Callout title="Platform Fee" type="info">
+  The dashboard charges a **0.20% platform fee** on all swaps, which helps support the development of the analytics infrastructure. This is independent of Solana network fees.
+</Callout>
+
+A standard **0.20% platform fee** is applied to every transaction executed through the dashboard.
+
+### Failed Transactions
+<Callout title="Slippage Warning" type="warn">
+  Transactions may fail during high volatility if the slippage tolerance is too low. Ensure you have sufficient SOL for gas fees.
+</Callout>
 - **Fee Collector**: These fees are routed to the project's treasury wallet (`2gAwq...`) to support ongoing development.
 - **Transparency**: The exact fee amount and the estimated output are displayed clearly before signing any transaction.
 

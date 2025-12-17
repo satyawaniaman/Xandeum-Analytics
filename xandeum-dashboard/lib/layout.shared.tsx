@@ -9,7 +9,29 @@ export function baseOptions(): BaseLayoutProps {
                     <span className="text-muted-foreground text-sm">Docs</span>
                 </div>
             ),
+            transparentMode: 'none',
         },
-        githubUrl: 'https://github.com/xandeum',
+        links: [
+            {
+                text: 'Dashboard',
+                url: '/dashboard',
+                active: 'nested-url',
+            },
+            {
+                text: 'Twitter',
+                url: 'https://x.com/Xandeum',
+                external: true,
+            },
+            {
+                text: 'Discord',
+                url: 'https://discord.com/invite/uqRSmmM5m',
+                external: true,
+            },
+            {
+                text: 'GitHub',
+                url: 'https://github.com/Xandeum-pNode-Analytics/pNode-analytics-platform',
+                external: true,
+            },
+        ],
     };
 }
