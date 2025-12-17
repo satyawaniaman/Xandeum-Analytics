@@ -1,67 +1,26 @@
-import { source } from '@/lib/source';
-import { DocsLayout } from 'fumadocs-ui/layouts/docs';
-import { RootProvider } from 'fumadocs-ui/provider/next';
-import { baseOptions } from '@/lib/layout.shared';
-import type { ReactNode, CSSProperties } from 'react';
-import Link from 'next/link';
+import DashboardPanelLayout from "@/components/dashboard-panel/dashboard-panel-layout";
+import { ContentLayout } from "@/components/dashboard-panel/content-layout";
+import { GeistSans } from "geist/font/sans";
+import { cn } from "@/lib/utils";
 
-function DocsFooter() {
-    const currentYear = new Date().getFullYear();
+export default function DocsLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     return (
-        <footer className="border-t border-border bg-background py-6 mt-auto">
-            <div className="container mx-auto px-4">
-                <div className="flex flex-col items-center gap-4">
-                    {/* Links */}
-                    <div className="flex gap-6 text-sm text-muted-foreground">
-                        <Link href="/dashboard" className="hover:text-foreground transition-colors">
-                            Dashboard
-                        </Link>
-                        <Link href="https://discord.gg/xandeum" target="_blank" className="hover:text-foreground transition-colors">
-                            Discord
-                        </Link>
-                        <Link href="https://twitter.com/xandeum" target="_blank" className="hover:text-foreground transition-colors">
-                            Twitter
-                        </Link>
-                        <Link href="https://github.com/xandeum" target="_blank" className="hover:text-foreground transition-colors">
-                            GitHub
-                        </Link>
-                    </div>
-
-                    {/* Copyright */}
-                    <div className="text-center">
-                        <p className="text-xs text-muted-foreground">
-                            © {currentYear} Xandeum Community. All rights reserved.
-                        </p>
-                        <p className="mt-1 text-center text-muted-foreground/60 text-[10px] max-w-md">
-                            Community-built analytics dashboard for the Xandeum network.
-                            Not affiliated with Xandeum Labs.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    );
-}
-
-
-
-import { GeistSans } from 'geist/font/sans';
-
-export default function Layout({ children }: { children: ReactNode }) {
-    return (
-        <div className={GeistSans.className} style={{ '--font-sans': GeistSans.style.fontFamily } as CSSProperties}>
-            <RootProvider>
-                <DocsLayout
-                    tree={source.pageTree}
-                    {...baseOptions()}
-                    sidebar={{
-                        defaultOpenLevel: 1,
-                    }}
-                >
+        <DashboardPanelLayout>
+            <ContentLayout title="Documentation">
+                <div className={cn(
+                    "prose dark:prose-invert max-w-3xl mx-auto py-8",
+                    "prose-headings:font-semibold prose-h1:text-4xl prose-h2:text-2xl prose-h3:text-xl",
+                    "prose-p:leading-7 prose-p:text-muted-foreground",
+                    "prose-a:text-primary prose-a:no-underline hover:prose-a:underline",
+                    GeistSans.className
+                )}>
                     {children}
-                </DocsLayout>
-                <DocsFooter />
-            </RootProvider>
-        </div>
+                </div>
+            </ContentLayout>
+        </DashboardPanelLayout>
     );
 }

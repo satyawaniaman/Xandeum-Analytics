@@ -9,6 +9,28 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-san
 export const metadata: Metadata = {
   title: "Xandeum Dashboard",
   description: "pNode Analytics Dashboard",
+  openGraph: {
+    title: "Xandeum Dashboard",
+    description: "Real-time analytics and monitoring for Xandeum pNodes.",
+    url: "https://analytics.xandeum.network",
+    siteName: "Xandeum Analytics",
+    images: [
+      {
+        url: "/hero-img.png",
+        width: 1200,
+        height: 630,
+        alt: "Xandeum Analytics Dashboard",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Xandeum Dashboard",
+    description: "Real-time analytics and monitoring for Xandeum pNodes.",
+    images: ["/hero-img.png"],
+  },
 };
 
 import { Toaster } from "@/components/ui/sonner";
