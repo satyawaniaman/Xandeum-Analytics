@@ -8,7 +8,9 @@ export const JUP_API = "https://api.jup.ag/swap/v1";
 // API Key for Ultra Swap
 export const JUP_API_KEY = process.env.NEXT_PUBLIC_JUP_SWAP_V1_API_KEY || "";
 
-export const JUP_REFERRAL_ADDRESS = "JUPTRFXx5qe2wMFBtC7c7s6DvS3weDgAZu7Lr4ZKtoQ";
+export const JUP_REFERRAL_ADDRESS = "FLd7cTVaEeEwNonVtoGGsN5e7RcF9QkUkt26t6jnf6QQ";
+export const FEE_COLLECTOR_WALLET = "2gAwqZmY7nRi9XCNQs3CjfSzDiVe5npwK3yS7ijo3E8h";
+export const PLATFORM_FEE_BPS = 20; // 0.2%
 
 export const DEFAULT_OPTIONS = {
   SLIPPAGE_BPS: 50, // 0.5%

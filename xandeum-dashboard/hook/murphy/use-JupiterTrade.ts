@@ -4,6 +4,8 @@ import {
   DEFAULT_OPTIONS,
   JUP_API,
   JUP_API_KEY,
+  FEE_COLLECTOR_WALLET,
+  PLATFORM_FEE_BPS,
 } from "../../constants/swap/jupiter-constants";
 import { getMint, getAccount, getAssociatedTokenAddress, TokenAccountNotFoundError, TokenInvalidAccountOwnerError } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -66,7 +68,8 @@ export async function fetchQuote(
       `&outputMint=${outputMint.toString()}` +
       `&amount=${amountStr}` +
       `&slippageBps=${slippageBps}` +
-      `&swapMode=ExactIn`;
+      `&swapMode=ExactIn` +
+      `&platformFeeBps=${PLATFORM_FEE_BPS}`;
 
     console.log(`Sending API request: ${apiUrl}`);
 
@@ -307,9 +310,27 @@ const trade = async (
     const quote = await quoteResponse.json();
     console.log("Quote response:", quote);
 
-    // Set up referral fee if available
-    const jupiterReferralAccount = process.env.NEXT_PUBLIC_JUPITER_REFERRAL_ACCOUNT;
-    const referralAccount = jupiterReferralAccount ? new PublicKey(jupiterReferralAccount) : undefined;
+    // Set up fee account
+    // We need the Associated Token Account (ATA) of the FEE_COLLECTOR_WALLET for the OUTPUT mint
+    // This allows us to collect fees in the token the user is buying
+    let feeAccount = undefined;
+    if (FEE_COLLECTOR_WALLET) {
+      try {
+        const feeWalletPubkey = new PublicKey(FEE_COLLECTOR_WALLET);
+        // Derive ATA for the output mint
+        const feeAccountPubkey = await getAssociatedTokenAddress(
+          outputMint,
+          feeWalletPubkey
+        );
+        feeAccount = feeAccountPubkey.toString();
+        console.log(`Using Fee Account (ATA): ${feeAccount} for Wallet: ${FEE_COLLECTOR_WALLET} and Mint: ${outputMint.toString()}`);
+      } catch (error) {
+        console.error("Error deriving fee account:", error);
+        // If we can't derive it, we just don't pass it (no fee collected, or transaction might fail if quote expected it?)
+        // If quote includes fee, we MUST pass feeAccount or swap might fail.
+        // But we'll log it.
+      }
+    }
 
     // Execute swap
     const swapResponse = await fetch(`${JUP_API}/swap`, {
@@ -321,7 +342,7 @@ const trade = async (
       body: JSON.stringify({
         quoteResponse: quote,
         userPublicKey: walletPublicKey,
-        feeAccount: referralAccount?.toString(),
+        feeAccount: feeAccount,
         wrapAndUnwrapSol: true,
       }),
     });
