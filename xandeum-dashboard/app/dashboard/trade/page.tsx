@@ -13,7 +13,7 @@ import { useState } from "react";
 
 // Dynamic import with SSR disabled for chart widget (uses window/document)
 const PriceChartWidget = dynamic(
-    () => import("@/components/chart-widget").then((mod) => mod.PriceChartWidget),
+    () => import("@/components/chart-widget"),
     {
         ssr: false,
         loading: () => (

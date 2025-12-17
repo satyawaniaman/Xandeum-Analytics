@@ -1,80 +1,90 @@
-import React, { useEffect, useRef } from 'react';
+"use client";
+
+import React, { useEffect, useRef, memo } from 'react';
 import { useTheme } from 'next-themes';
 
-declare global {
-    interface Window {
-        createMyWidget?: (
-            containerId: string,
-            config: Record<string, unknown>
-        ) => void;
-    }
-}
+function TradingViewWidget() {
+    const container = useRef<HTMLDivElement>(null);
+    const { resolvedTheme, theme } = useTheme();
 
-
-const PRICE_CHART_ID = 'price-chart-widget-container';
-
-export const PriceChartWidget = () => {
-    const containerRef = useRef<HTMLDivElement | null>(null);
-    const { resolvedTheme } = useTheme();
+    // Determine if dark mode - handle SSR by defaulting to dark
+    const isDark = resolvedTheme === 'dark' || theme === 'dark' || typeof window === 'undefined';
 
     useEffect(() => {
-        if (typeof window === 'undefined') return;
+        if (!container.current) return;
 
-        // Theme-aware colors
-        const isDark = resolvedTheme === 'dark';
-        const backgroundColor = isDark ? '#171717' : '#ffffff';
-        const gridColor = isDark ? '#1c1c1f' : '#e5e7eb';
-        const textColor = isDark ? '#9f9fa9' : '#374151';
+        // Clear the container completely
+        const widgetContainer = container.current.querySelector('.tradingview-widget-container__widget');
+        if (widgetContainer) {
+            widgetContainer.innerHTML = '';
+        }
 
-        const loadWidget = () => {
-            if (typeof window.createMyWidget === 'function') {
-                window.createMyWidget(PRICE_CHART_ID, {
-                    autoSize: true,
-                    chainId: 'solana',
-                    tokenAddress: 'XANDuUoVoUqniKkpcKhrxmvYJybpJvUxJLr21Gaj3Hx',
-                    showHoldersChart: true,
-                    defaultInterval: '1D',
-                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'Etc/UTC',
-                    theme: 'moralis',
-                    locale: 'en',
-                    showCurrencyToggle: true,
-                    backgroundColor,
-                    candleUpColor: '#00bd7d',
-                    candleDownColor: '#fb2c37',
-                    gridColor,
-                    textColor,
-                    hideLeftToolbar: true,
-                    hideTopToolbar: false,
-                    hideBottomToolbar: false,
-                });
+        // Remove any existing scripts
+        const existingScripts = container.current.querySelectorAll('script');
+        existingScripts.forEach(s => s.remove());
+
+        const script = document.createElement("script");
+        script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+        script.type = "text/javascript";
+        script.async = true;
+        script.innerHTML = JSON.stringify({
+            "allow_symbol_change": true,
+            "calendar": false,
+            "details": false,
+            "hide_side_toolbar": true,
+            "hide_top_toolbar": false,
+            "hide_legend": false,
+            "hide_volume": false,
+            "hotlist": false,
+            "interval": "D",
+            "locale": "en",
+            "save_image": true,
+            "style": "1",
+            "symbol": "RAYDIUMCPMM:XANDSOL_C9ZJUG",
+            "theme": isDark ? "dark" : "light",
+            "timezone": "Etc/UTC",
+            "backgroundColor": isDark ? "#171717" : "#ffffff",
+            "gridColor": isDark ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.06)",
+            "watchlist": [],
+            "withdateranges": false,
+            "compareSymbols": [],
+            "studies": [],
+            "autosize": true
+        });
+
+        container.current.appendChild(script);
+
+        return () => {
+            if (container.current) {
+                const scripts = container.current.querySelectorAll('script');
+                scripts.forEach(s => s.remove());
             }
         };
-
-        // Clear existing widget content before reloading
-        const container = document.getElementById(PRICE_CHART_ID);
-        if (container) {
-            container.innerHTML = '';
-        }
-
-        if (!document.getElementById('moralis-chart-widget')) {
-            const script = document.createElement('script');
-            script.id = 'moralis-chart-widget';
-            script.src = 'https://moralis.com/static/embed/chart.js';
-            script.async = true;
-            script.onload = loadWidget;
-            document.body.appendChild(script);
-        } else {
-            loadWidget();
-        }
-    }, [resolvedTheme]);
+    }, [isDark]);
 
     return (
-        <div style={{ width: '100%', height: '100%' }}>
+        <div
+            className="tradingview-widget-container bg-card rounded-lg overflow-hidden border border-border"
+            ref={container}
+            style={{ height: "100%", width: "100%" }}
+        >
             <div
-                id={PRICE_CHART_ID}
-                ref={containerRef}
-                style={{ width: '100%', height: '100%' }}
+                className="tradingview-widget-container__widget"
+                style={{ height: "calc(100% - 32px)", width: "100%" }}
             />
+            <div className="tradingview-widget-copyright text-xs text-muted-foreground px-2 py-1 bg-card">
+                <a
+                    href="https://www.tradingview.com/symbols/XANDSOL_C9ZJUG/?exchange=RAYDIUMCPMM"
+                    rel="noopener nofollow"
+                    target="_blank"
+                    className="text-primary hover:underline"
+                >
+                    XAND_SOL price
+                </a>
+                <span> by TradingView</span>
+            </div>
         </div>
     );
-};
+}
+
+export default memo(TradingViewWidget);

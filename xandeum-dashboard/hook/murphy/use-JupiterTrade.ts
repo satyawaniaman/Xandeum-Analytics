@@ -310,45 +310,26 @@ const trade = async (
     const quote = await quoteResponse.json();
     console.log("Quote response:", quote);
 
-    // Set up fee account
-    // We need the Associated Token Account (ATA) of the FEE_COLLECTOR_WALLET for the OUTPUT mint
-    // This allows us to collect fees in the token the user is buying
-    let feeAccount = undefined;
-    if (FEE_COLLECTOR_WALLET) {
-      try {
-        const feeWalletPubkey = new PublicKey(FEE_COLLECTOR_WALLET);
-        // Derive ATA for the output mint
-        const feeAccountPubkey = await getAssociatedTokenAddress(
-          outputMint,
-          feeWalletPubkey
-        );
-        feeAccount = feeAccountPubkey.toString();
-        console.log(`Using Fee Account (ATA): ${feeAccount} for Wallet: ${FEE_COLLECTOR_WALLET} and Mint: ${outputMint.toString()}`);
-      } catch (error) {
-        console.error("Error deriving fee account:", error);
-        // If we can't derive it, we just don't pass it (no fee collected, or transaction might fail if quote expected it?)
-        // If quote includes fee, we MUST pass feeAccount or swap might fail.
-        // But we'll log it.
-      }
-    }
+    // Execute swap - fee collection disabled for now
+    const swapRequestBody: Record<string, unknown> = {
+      quoteResponse: quote,
+      userPublicKey: walletPublicKey,
+      wrapAndUnwrapSol: true,
+    };
 
-    // Execute swap
     const swapResponse = await fetch(`${JUP_API}/swap`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         ...(JUP_API_KEY && { 'x-api-key': JUP_API_KEY }),
       },
-      body: JSON.stringify({
-        quoteResponse: quote,
-        userPublicKey: walletPublicKey,
-        feeAccount: feeAccount,
-        wrapAndUnwrapSol: true,
-      }),
+      body: JSON.stringify(swapRequestBody),
     });
 
     if (!swapResponse.ok) {
-      throw new Error(`Error executing swap: ${swapResponse.status} ${swapResponse.statusText}`);
+      const errorText = await swapResponse.text();
+      console.error(`Swap API error (${swapResponse.status}): ${errorText}`);
+      throw new Error(`Error executing swap: ${swapResponse.status} - ${errorText}`);
     }
 
     const swapResult = await swapResponse.json();

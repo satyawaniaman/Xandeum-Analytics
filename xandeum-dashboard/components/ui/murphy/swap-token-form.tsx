@@ -174,6 +174,11 @@ export function SwapForm({
     };
   }, [inputTimeout]);
 
+  // Clear form errors when wallet connects/disconnects to prevent premature validation messages
+  useEffect(() => {
+    form.clearErrors();
+  }, [connected, form]);
+
   // Determine network from connection endpoint
   const networkName = useMemo(() => {
     if (!connection) return "Unknown";
@@ -1118,6 +1123,17 @@ export function SwapForm({
             )}
           </form>
         </Form>
+        <div className="text-xs text-center text-muted-foreground mt-4 pt-4 border-t border-border">
+          Powered by{" "}
+          <a
+            href="https://jup.ag"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Jupiter
+          </a>
+        </div>
       </CardContent>
     </Card>
   );
