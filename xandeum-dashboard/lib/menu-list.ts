@@ -72,7 +72,39 @@ export function getMenuList(_pathname: string): Group[] {
                 {
                     href: "/docs",
                     label: "Documentation",
-                    icon: BookOpenIcon
+                    icon: BookOpenIcon,
+                    submenus: [
+                        {
+                            href: "/docs",
+                            label: "Introduction",
+                            active: _pathname === "/docs"
+                        },
+                        {
+                            href: "/docs/platform/backend",
+                            label: "Platform Backend",
+                            active: _pathname === "/docs/platform/backend"
+                        },
+                        {
+                            href: "/docs/platform/frontend",
+                            label: "Platform Frontend",
+                            active: _pathname === "/docs/platform/frontend"
+                        },
+                        {
+                            href: "/docs/features/swaps",
+                            label: "Token Swaps",
+                            active: _pathname === "/docs/features/swaps"
+                        },
+                        {
+                            href: "/docs/develop/api",
+                            label: "API Reference",
+                            active: _pathname === "/docs/develop/api"
+                        },
+                        {
+                            href: "/docs/develop/integrations",
+                            label: "Integrations",
+                            active: _pathname === "/docs/develop/integrations"
+                        }
+                    ]
                 }
             ]
         },

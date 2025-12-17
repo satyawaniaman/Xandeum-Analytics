@@ -24,13 +24,13 @@ export function Menu({ isOpen }: MenuProps) {
   const menuList = getMenuList(pathname);
 
   return (
-    <ScrollArea className="[&>div>div[style]]:!block">
-      <nav className="mt-8 h-full w-full">
-        <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-1 px-2">
+    <div className="h-full">
+      <nav className="mt-4 h-full w-full">
+        <ul className="flex flex-col min-h-0 items-start space-y-1 px-2">
           {menuList.map(({ groupLabel, menus }, index) => (
-            <li className={cn("w-full", groupLabel ? "pt-5" : "")} key={index}>
+            <li className={cn("w-full", groupLabel ? "pt-2" : "")} key={index}>
               {(isOpen && groupLabel) || isOpen === undefined ? (
-                <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
+                <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[200px] truncate">
                   {groupLabel}
                 </p>
               ) : groupLabel ? (
@@ -48,7 +48,7 @@ export function Menu({ isOpen }: MenuProps) {
                             <Button
                               variant={
                                 (active === undefined &&
-                                  pathname.startsWith(href)) ||
+                                  (href === "/dashboard" ? pathname === href : pathname.startsWith(href))) ||
                                   active
                                   ? "secondary"
                                   : "ghost"
@@ -64,7 +64,7 @@ export function Menu({ isOpen }: MenuProps) {
                                 </span>
                                 <p
                                   className={cn(
-                                    "max-w-[200px] truncate",
+                                    "max-w-[170px] truncate",
                                     isOpen === false
                                       ? "-translate-x-96 opacity-0"
                                       : "translate-x-0 opacity-100"
@@ -103,6 +103,6 @@ export function Menu({ isOpen }: MenuProps) {
           ))}
         </ul>
       </nav>
-    </ScrollArea>
+    </div>
   );
 }

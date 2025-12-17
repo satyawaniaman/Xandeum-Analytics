@@ -103,32 +103,32 @@ export function CollapseMenuButton({
                 </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                {submenus.map(({ href, label, active }, index) => (
-                    <Button
-                        key={index}
-                        variant={
-                            (active === undefined && pathname === href) || active
-                                ? "secondary"
-                                : "ghost"
-                        }
-                        className="w-full justify-start h-10 mb-1"
-                        asChild
-                    >
-                        <Link href={href}>
-                            <span className="mr-4 ml-2 w-1 h-1 rounded-full bg-muted-foreground" />
-                            <p
-                                className={cn(
-                                    "max-w-[170px] truncate",
-                                    isOpen
-                                        ? "translate-x-0 opacity-100"
-                                        : "-translate-x-96 opacity-0"
+                {submenus.map(({ href, label, active }, index) => {
+                    const isActive =
+                        (active === undefined && pathname === href) || active;
+
+                    return (
+                        <Button
+                            key={index}
+                            variant="link"
+                            asChild
+                            className={cn(
+                                "relative w-full justify-start h-9 mb-1 px-8 text-sm",
+                                isActive
+                                    ? "text-foreground font-medium"
+                                    : "text-muted-foreground hover:text-foreground"
+                            )}
+                        >
+                            <Link href={href}>
+                                {isActive && (
+                                    <span className="absolute left-4 h-4 w-0.5 rounded-full bg-foreground" />
                                 )}
-                            >
-                                {label}
-                            </p>
-                        </Link>
-                    </Button>
-                ))}
+                                <p className="truncate">{label}</p>
+                            </Link>
+                        </Button>
+                    );
+                })}
+
             </CollapsibleContent>
         </Collapsible>
     ) : (
