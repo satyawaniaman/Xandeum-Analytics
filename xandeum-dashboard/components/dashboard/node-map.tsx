@@ -1,8 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
     ComposableMap,
     Geographies,
@@ -11,6 +18,65 @@ import {
     ZoomableGroup,
 } from "react-simple-maps";
 import type { PNode, PNodesSummary } from "@/lib/types";
+
+// Country name to abbreviation mapping
+const COUNTRY_ABBREV: Record<string, string> = {
+    "United States": "US",
+    "United Kingdom": "UK",
+    "Germany": "DE",
+    "France": "FR",
+    "Netherlands": "NL",
+    "Canada": "CA",
+    "Australia": "AU",
+    "Japan": "JP",
+    "Singapore": "SG",
+    "India": "IN",
+    "Brazil": "BR",
+    "South Korea": "KR",
+    "Finland": "FI",
+    "Poland": "PL",
+    "Italy": "IT",
+    "Spain": "ES",
+    "Sweden": "SE",
+    "Norway": "NO",
+    "Denmark": "DK",
+    "Switzerland": "CH",
+    "Austria": "AT",
+    "Belgium": "BE",
+    "Ireland": "IE",
+    "Portugal": "PT",
+    "Czech Republic": "CZ",
+    "Romania": "RO",
+    "Ukraine": "UA",
+    "Russia": "RU",
+    "China": "CN",
+    "Hong Kong": "HK",
+    "Taiwan": "TW",
+    "Thailand": "TH",
+    "Vietnam": "VN",
+    "Indonesia": "ID",
+    "Malaysia": "MY",
+    "Philippines": "PH",
+    "New Zealand": "NZ",
+    "South Africa": "ZA",
+    "Mexico": "MX",
+    "Argentina": "AR",
+    "Chile": "CL",
+    "Colombia": "CO",
+    "Turkey": "TR",
+    "Israel": "IL",
+    "UAE": "AE",
+};
+
+// Get abbreviation for a country (first 2 chars uppercase if not in map)
+function getCountryAbbrev(country: string): string {
+    return COUNTRY_ABBREV[country] || country.slice(0, 2).toUpperCase();
+}
+
+// Get abbreviation for a city (first 3 chars)
+function getCityAbbrev(city: string): string {
+    return city.length > 4 ? city.slice(0, 3).toUpperCase() : city;
+}
 
 interface NodeMapProps {
     nodes: PNode[];
@@ -62,7 +128,7 @@ function formatTimeAgo(seconds: number | null): string {
     return `${Math.floor(seconds / 3600)}h ago`;
 }
 
-export function NodeMap({ nodes, summary, className }: NodeMapProps) {
+export function NodeMap({ nodes, className }: NodeMapProps) {
     const [zoom, setZoom] = useState(1.9);
     const [center, setCenter] = useState<[number, number]>([10, 25]);
     const [hoveredGroup, setHoveredGroup] = useState<LocationGroup | null>(null);
@@ -143,7 +209,7 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                     </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                    <div className="relative h-[420px] w-full overflow-hidden rounded-lg bg-muted">
+                    <div className="relative md:h-[420px] h-[320px] lg:h-[520px] w-full overflow-hidden rounded-lg bg-muted">
                         <ComposableMap
                             projection="geoMercator"
                             projectionConfig={{ scale: 120, center: [0, 20] }}
@@ -163,7 +229,7 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                                             <Geography
                                                 key={geo.rsmKey}
                                                 geography={geo}
-                                                className="fill-slate-300 stroke-slate-400 dark:fill-zinc-700 dark:stroke-zinc-600"
+                                                className="fill-zinc-300 stroke-zinc-400 dark:fill-zinc-400 dark:stroke-zinc-600 hover:fill-zinc-400 dark:hover:fill-zinc-500 transition-colors cursor-pointer"
                                                 strokeWidth={0.3}
                                                 style={{
                                                     default: { outline: "none" },
@@ -206,9 +272,8 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                                             <circle
                                                 r={isHovered ? markerSize + 1 : markerSize}
                                                 fill={fillColor}
-                                                stroke="#18181b"
+                                                className="cursor-pointer stroke-background dark:stroke-zinc-900"
                                                 strokeWidth={1}
-                                                className="cursor-pointer"
                                                 style={{
                                                     transition: "all 0.15s ease-out",
                                                     opacity: hasOnline ? 1 : 0.6,
@@ -219,7 +284,6 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                                 })}
                             </ZoomableGroup>
                         </ComposableMap>
-
                         {/* Hover Tooltip */}
                         {hoveredGroup && hoveredGroup.nodes[0] && (
                             <div className="absolute bottom-3 left-3 z-50">
@@ -298,7 +362,7 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                     </div>
 
                     {/* Legend */}
-                    <div className="flex gap-4 mt-3 text-xs">
+                    <div className="flex gap-4 mt-3 text-xs justify-center">
                         <div className="flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full bg-emerald-500" />
                             <span className="text-muted-foreground">Public RPC</span>
@@ -342,33 +406,7 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
 
                     <div className="h-px bg-border" />
 
-                    {/* Top Countries */}
-                    <div>
-                        <div className="text-xs text-muted-foreground mb-2">Top Countries</div>
-                        <div className="space-y-1.5">
-                            {(() => {
-                                const countryCounts = new Map<string, number>();
-                                nodes.slice(0, 200).forEach(n => {
-                                    if (n.country) {
-                                        countryCounts.set(n.country, (countryCounts.get(n.country) || 0) + 1);
-                                    }
-                                });
-                                return Array.from(countryCounts.entries())
-                                    .sort((a, b) => b[1] - a[1])
-                                    .slice(0, 5)
-                                    .map(([country, count]) => (
-                                        <div key={country} className="flex items-center justify-between text-sm">
-                                            <span className="text-foreground truncate">{country}</span>
-                                            <span className="text-muted-foreground tabular-nums">{count}</span>
-                                        </div>
-                                    ));
-                            })()}
-                        </div>
-                    </div>
-
-                    <div className="h-px bg-border" />
-
-                    {/* Version Distribution */}
+                    {/* Version Distribution - moved before countries */}
                     <div>
                         <div className="text-xs text-muted-foreground mb-2">Version Distribution</div>
                         <div className="space-y-1.5">
@@ -393,7 +431,54 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
 
                     <div className="h-px bg-border" />
 
-                    {/* Top Cities */}
+                    {/* Top Countries with inline progress bars */}
+                    <div>
+                        <div className="text-xs text-muted-foreground mb-2">Top Countries</div>
+                        <div className="space-y-1.5">
+                            {(() => {
+                                const countryCounts = new Map<string, number>();
+                                nodes.slice(0, 200).forEach(n => {
+                                    if (n.country) {
+                                        countryCounts.set(n.country, (countryCounts.get(n.country) || 0) + 1);
+                                    }
+                                });
+                                const sorted = Array.from(countryCounts.entries())
+                                    .sort((a, b) => b[1] - a[1])
+                                    .slice(0, 5);
+                                const maxCount = sorted[0]?.[1] || 1;
+
+                                return sorted.map(([country, count]) => (
+                                    <div key={country} className="flex items-center gap-2 text-sm">
+                                        <TooltipProvider delayDuration={100}>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span className="text-foreground w-8 shrink-0 cursor-default font-medium">
+                                                        {getCountryAbbrev(country)}
+                                                    </span>
+                                                </TooltipTrigger>
+                                                <TooltipContent side="left" className="text-xs">
+                                                    {country}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                        <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                                            <motion.div
+                                                className="h-full rounded-full bg-primary/60"
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${(count / maxCount) * 100}%` }}
+                                                transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+                                            />
+                                        </div>
+                                        <span className="text-muted-foreground tabular-nums w-6 text-right shrink-0">{count}</span>
+                                    </div>
+                                ));
+                            })()}
+                        </div>
+                    </div>
+
+                    <div className="h-px bg-border" />
+
+                    {/* Top Cities with inline progress bars */}
                     <div>
                         <div className="text-xs text-muted-foreground mb-2">Top Cities</div>
                         <div className="space-y-1.5">
@@ -404,15 +489,36 @@ export function NodeMap({ nodes, summary, className }: NodeMapProps) {
                                         cityCounts.set(n.city, (cityCounts.get(n.city) || 0) + 1);
                                     }
                                 });
-                                return Array.from(cityCounts.entries())
+                                const sorted = Array.from(cityCounts.entries())
                                     .sort((a, b) => b[1] - a[1])
-                                    .slice(0, 4)
-                                    .map(([city, count]) => (
-                                        <div key={city} className="flex items-center justify-between text-sm">
-                                            <span className="text-foreground truncate">{city}</span>
-                                            <span className="text-muted-foreground tabular-nums">{count}</span>
+                                    .slice(0, 4);
+                                const maxCount = sorted[0]?.[1] || 1;
+
+                                return sorted.map(([city, count]) => (
+                                    <div key={city} className="flex items-center gap-2 text-sm">
+                                        <TooltipProvider delayDuration={100}>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span className="text-foreground w-10 shrink-0 cursor-default font-medium">
+                                                        {getCityAbbrev(city)}
+                                                    </span>
+                                                </TooltipTrigger>
+                                                <TooltipContent side="left" className="text-xs">
+                                                    {city}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                        <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                                            <motion.div
+                                                className="h-full rounded-full bg-primary/60"
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${(count / maxCount) * 100}%` }}
+                                                transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
+                                            />
                                         </div>
-                                    ));
+                                        <span className="text-muted-foreground tabular-nums w-6 text-right shrink-0">{count}</span>
+                                    </div>
+                                ));
                             })()}
                         </div>
                     </div>

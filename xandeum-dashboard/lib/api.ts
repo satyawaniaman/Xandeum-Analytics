@@ -36,7 +36,11 @@ export async function fetchPNodesStats(): Promise<GetPNodesStatsResponse> {
  * Fetch single pNode by address
  */
 export async function fetchPNodeByAddress(address: string): Promise<PNode> {
-    const encodedAddress = encodeURIComponent(address);
+    // Ensure we only use the IP address (strip port if present)
+    // The backend expects just the IP
+    const ip = address.includes(":") ? address.split(":")[0] : address;
+    const encodedAddress = encodeURIComponent(ip);
+
     const response = await fetch(`${API_BASE_URL}/pnodes/${encodedAddress}`, {
         cache: "no-store",
     });

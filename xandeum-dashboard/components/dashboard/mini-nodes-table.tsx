@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +37,7 @@ function formatUptime(uptimeHuman: string | null): string {
 }
 
 export function MiniNodesTable({ nodes, className, showAll = false }: MiniNodesTableProps) {
+    const router = useRouter();
     // Show top nodes sorted by status (online first) then by last seen
     const sortedNodes = [...nodes].sort((a, b) => {
         // Online nodes first
@@ -82,13 +84,14 @@ export function MiniNodesTable({ nodes, className, showAll = false }: MiniNodesT
                                 <TableRow
                                     key={node.id}
                                     className="border-border hover:bg-muted cursor-pointer"
+                                    onClick={() => router.push(`/dashboard/nodes/${encodeURIComponent(node.ip)}`)}
                                 >
                                     <TableCell>
                                         <StatusBadge status={node.status} showLabel={true} size="sm" />
                                     </TableCell>
                                     <TableCell className="font-mono text-sm text-foreground">
                                         <Link
-                                            href={`/dashboard/nodes/${encodeURIComponent(node.address)}`}
+                                            href={`/dashboard/nodes/${encodeURIComponent(node.ip)}`}
                                             className="hover:text-foreground hover:underline"
                                         >
                                             {node.ip}
