@@ -66,7 +66,7 @@ export function Navbar({ title, onRefresh, onSearch, onExport, networkStatus = "
   }, [handleRefresh]);
 
   return (
-    <header className="sticky top-0 z-10 w-full border-b border-border bg-background/80 backdrop-blur-sm">
+    <header className="fixed top-0 left-0 right-0 z-30 w-full border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="px-6 flex h-14 items-center justify-between gap-4">
         <div className="flex items-center space-x-4 lg:space-x-3">
           <SheetMenu />

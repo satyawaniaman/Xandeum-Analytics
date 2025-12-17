@@ -19,22 +19,9 @@ interface TokenData {
     };
 }
 
-const formatNumber = (num: number) => {
-    if (num >= 1000000000) return (num / 1000000000).toFixed(2) + "B";
-    if (num >= 1000000) return (num / 1000000).toFixed(2) + "M";
-    if (num >= 1000) return (num / 1000).toFixed(2) + "K";
-    return num.toFixed(2);
-};
+import { NumberTicker } from "@/components/ui/number-ticker";
 
-const formatCurrency = (value: string | number) => {
-    const num = typeof value === 'string' ? parseFloat(value) : value;
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    }).format(num);
-};
+
 
 export function MarketStatsCard() {
     const [data, setData] = useState<TokenData | null>(null);
@@ -47,7 +34,6 @@ export function MarketStatsCard() {
                 const json = await response.json();
 
                 if (json.pairs && json.pairs.length > 0) {
-                    // Find the most liquid pair or just take the first one
                     const pair = json.pairs[0];
                     setData({
                         priceUsd: pair.priceUsd,
@@ -66,12 +52,10 @@ export function MarketStatsCard() {
         };
 
         fetchData();
-        // Refresh every 30 seconds
         const interval = setInterval(fetchData, 30000);
         return () => clearInterval(interval);
     }, []);
 
-    // Static supply data as requested
     const MAX_SUPPLY = 4010000000;
     const CIRCL_SUPPLY = 1340000000;
 
@@ -87,32 +71,52 @@ export function MarketStatsCard() {
 
     if (!data) return null;
 
+    // Helper to prepare ticker data
+    const getTickerData = (num: number, isCurrency = false) => {
+        let value = num;
+        let suffix = "";
+        const prefix = isCurrency ? "$" : "";
+
+        if (num >= 1000000000) {
+            value = num / 1000000000;
+            suffix = "B";
+        } else if (num >= 1000000) {
+            value = num / 1000000;
+            suffix = "M";
+        } else if (num >= 1000) {
+            value = num / 1000;
+            suffix = "K";
+        }
+
+        return { value, prefix, suffix, decimals: 2 };
+    };
+
     const stats = [
         {
             label: "Market Cap",
-            value: data.marketCap ? formatCurrency(data.marketCap) : "$10.75M", // Fallback to user provided if API missing
+            ...getTickerData(data.marketCap || 10750000, true),
         },
         {
             label: "Volume 24h",
-            value: formatCurrency(data.volume.h24),
+            ...getTickerData(data.volume.h24, true),
             subValue: `${data.priceChange.h24 > 0 ? "+" : ""}${data.priceChange.h24}%`,
             isPositive: data.priceChange.h24 >= 0
         },
         {
             label: "FDV",
-            value: formatCurrency(data.fdv),
+            ...getTickerData(data.fdv, true),
         },
         {
             label: "Liquidity",
-            value: formatCurrency(data.liquidity.usd),
+            ...getTickerData(data.liquidity.usd, true),
         },
         {
             label: "Max Supply",
-            value: formatNumber(MAX_SUPPLY),
+            ...getTickerData(MAX_SUPPLY),
         },
         {
             label: "Circulating Supply",
-            value: formatNumber(CIRCL_SUPPLY),
+            ...getTickerData(CIRCL_SUPPLY),
         }
     ];
 
@@ -122,14 +126,17 @@ export function MarketStatsCard() {
                 <Card key={i} className="bg-card border-border">
                     <CardContent className="p-4">
                         <p className="text-xs text-muted-foreground font-medium">{stat.label}</p>
-                        <div className="mt-2 flex items-baseline gap-2">
-                            <p className="text-lg font-semibold text-foreground">
-                                {stat.value}
-                            </p>
-                            {stat.subValue && (
-                                <span className={`text-xs flex items-center ${stat.isPositive ? "text-green-500" : "text-red-500"}`}>
-                                    {stat.isPositive ? <ArrowUp className="w-3 h-3 mr-0.5" /> : <ArrowDown className="w-3 h-3 mr-0.5" />}
-                                    {stat.subValue.replace("-", "")}
+                        <div className="mt-2 flex items-baseline gap-1">
+                            {stat.prefix && <span className="text-lg font-semibold text-foreground">{stat.prefix}</span>}
+                            <span className="text-lg font-semibold text-foreground">
+                                <NumberTicker value={stat.value} decimalPlaces={stat.decimals} />
+                            </span>
+                            {stat.suffix && <span className="text-lg font-semibold text-foreground">{stat.suffix}</span>}
+
+                            {"subValue" in stat && stat.subValue && (
+                                <span className={`text-xs ml-1 flex items-center ${"isPositive" in stat && stat.isPositive ? "text-green-500" : "text-red-500"}`}>
+                                    {"isPositive" in stat && stat.isPositive ? <ArrowUp className="w-3 h-3 mr-0.5" /> : <ArrowDown className="w-3 h-3 mr-0.5" />}
+                                    {String(stat.subValue).replace("-", "")}
                                 </span>
                             )}
                         </div>

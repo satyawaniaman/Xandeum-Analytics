@@ -12,7 +12,7 @@ export function ContentLayout({ title, children, onRefresh, onExport, networkSta
   return (
     <div className="bg-background min-h-screen">
       <Navbar title={title} onRefresh={onRefresh} onExport={onExport} networkStatus={networkStatus} />
-      <div className="px-6 py-6">{children}</div>
+      <div className="pt-20 px-6 py-6 max-w-7xl mx-auto">{children}</div>
     </div>
   );
 }
