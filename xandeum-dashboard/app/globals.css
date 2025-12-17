@@ -1,8 +1,8 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "fumadocs-ui/css/neutral.css";
-@import "fumadocs-ui/css/preset.css";
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -116,6 +116,41 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+.theme-xandeum {
+  --background: #050B27;
+  --foreground: #FFFFFF;
+  --card: #08113B;
+  --card-foreground: #FFFFFF;
+  --popover: #08113B;
+  --popover-foreground: #FFFFFF;
+  --primary: #198476;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FDA31B;
+  --secondary-foreground: #000000;
+  --muted: #08113B;
+  --muted-foreground: #A1A1AA;
+  --accent: #FDA31B;
+  --accent-foreground: #000000;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #FFFFFF;
+  --border: #198476;
+  --input: #198476;
+  --ring: #198476;
+  --chart-1: #198476;
+  --chart-2: #FDA31B;
+  --chart-3: #08113B;
+  --chart-4: #050B27;
+  --chart-5: #FFFFFF;
+  --sidebar: #050B27;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #198476;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #08113B;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #198476;
+  --sidebar-ring: #198476;
 }
 
 @layer base {

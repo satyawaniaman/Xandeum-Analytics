@@ -10,7 +10,7 @@ export function DashboardFooter() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="border-t border-border bg-background py-6 mt-auto">
+        <footer className="relative z-30 border-t border-border bg-background py-6 mt-auto">
             <div className="container mx-auto px-4">
                 {/* Social Icons */}
                 <div className="flex justify-center gap-4 mb-4">

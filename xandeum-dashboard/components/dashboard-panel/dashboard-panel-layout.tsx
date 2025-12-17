@@ -19,20 +19,13 @@ export default function AdminPanelLayout({
             <Sidebar />
             <main
                 className={cn(
-                    "flex-1 transition-[margin-left] ease-in-out duration-300",
-                    !settings.disabled && (!getOpenState() ? "lg:ml-[90px]" : "lg:ml-72")
+                    "flex-1 flex flex-col transition-[margin-left] ease-in-out duration-300",
+                    !settings.disabled && (!getOpenState() ? "lg:ml-[106px]" : "lg:ml-[272px]")
                 )}
             >
                 {children}
-            </main>
-            <div
-                className={cn(
-                    "transition-[margin-left] ease-in-out duration-300",
-                    !settings.disabled && (!getOpenState() ? "lg:ml-[90px]" : "lg:ml-72")
-                )}
-            >
                 <DashboardFooter />
-            </div>
+            </main>
         </div>
     );
 }
