@@ -57,7 +57,7 @@ export async function getPods(): Promise<Pod[]> {
   if (!parsed.success) {
     logger.error(
       { error: parsed.error.format() },
-      "get-pods result validation failed",
+      "get-pods result validation failed"
     );
     throw new Error("get-pods result validation failed");
   }

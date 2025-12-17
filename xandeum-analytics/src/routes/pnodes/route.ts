@@ -39,7 +39,7 @@ function toNumberMaybe(value?: string | number | bigint | null): number | null {
  */
 function determineNodeStatus(
   node: PNode,
-  lastSeenAgoSeconds: number | null,
+  lastSeenAgoSeconds: number | null
 ): {
   status: "online_public" | "online_private" | "offline" | "unknown";
   hasPublicRpc: boolean;
@@ -111,7 +111,7 @@ function mapNodeToDetailDto(node: PNode) {
   // Determine comprehensive node status
   const { status, hasPublicRpc, isOnline } = determineNodeStatus(
     node,
-    lastSeenAgoSeconds,
+    lastSeenAgoSeconds
   );
 
   return {
@@ -251,7 +251,7 @@ app.get("/stats", async (c) => {
         return lastSeenAgo !== null && lastSeenAgo < 300;
       }).length,
       with_public_rpc: nodes.filter(
-        (n) => n.cpuPercent !== null || n.ramUsedBytes !== null,
+        (n) => n.cpuPercent !== null || n.ramUsedBytes !== null
       ).length,
       timestamp: new Date().toISOString(),
     };
@@ -341,7 +341,7 @@ app.post("/sync", async (c) => {
         error: "Sync failed",
         message: err instanceof Error ? err.message : "Unknown error",
       },
-      500,
+      500
     );
   }
 });
@@ -350,7 +350,7 @@ app.post("/sync", async (c) => {
  * POST /pnodes/cleanup
  * Manually cleanup stale nodes from the database.
  * Protected with Bearer token authentication.
- * 
+ *
  * Query params:
  * - days: number of days to consider a node stale (default: 7)
  * - dryRun: if "true", only report what would be deleted without actually deleting
@@ -431,7 +431,7 @@ app.post("/cleanup", async (c) => {
         error: "Cleanup failed",
         message: err instanceof Error ? err.message : "Unknown error",
       },
-      500,
+      500
     );
   }
 });

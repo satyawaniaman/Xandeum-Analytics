@@ -38,7 +38,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  */
 export async function getStatsForIp(
   ip: string,
-  maxRetries: number = 2,
+  maxRetries: number = 2
 ): Promise<StatsResult | null> {
   const url = `http://${ip}:6000/rpc`;
 
@@ -57,13 +57,13 @@ export async function getStatsForIp(
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
 
       if (data.error) {
         logger.debug(
           { ip, error: data.error, attempt },
-          `get-stats error for ${ip}`,
+          `get-stats error for ${ip}`
         );
         if (attempt < maxRetries) {
           await sleep(500 * attempt); // Exponential backoff: 500ms, 1000ms
@@ -76,7 +76,7 @@ export async function getStatsForIp(
       if (!parsed.success) {
         logger.debug(
           { ip, error: parsed.error.format(), attempt },
-          `get-stats parse error for ${ip}`,
+          `get-stats parse error for ${ip}`
         );
         return null;
       }
@@ -95,7 +95,7 @@ export async function getStatsForIp(
       ) {
         logger.debug(
           { ip, error: error.message, attempt },
-          `Node ${ip} unreachable (port likely closed)`,
+          `Node ${ip} unreachable (port likely closed)`
         );
         return null; // Exit early, no point retrying
       }
@@ -104,7 +104,7 @@ export async function getStatsForIp(
       if (attempt < maxRetries) {
         logger.debug(
           { ip, error: error.message, attempt },
-          `Retrying get-stats for ${ip}`,
+          `Retrying get-stats for ${ip}`
         );
         await sleep(500 * attempt);
         continue;
@@ -112,7 +112,7 @@ export async function getStatsForIp(
 
       logger.debug(
         { ip, error: error.message, attempt },
-        `get-stats failed for ${ip} after ${maxRetries} attempts`,
+        `get-stats failed for ${ip} after ${maxRetries} attempts`
       );
       return null;
     }
@@ -126,7 +126,7 @@ export async function getStatsForIp(
  */
 export async function batchGetStats(
   addresses: string[],
-  concurrency: number = 10,
+  concurrency: number = 10
 ): Promise<Map<string, StatsResult | null>> {
   const results = new Map<string, StatsResult | null>();
   const pLimit = (await import("p-limit")).default;
@@ -138,7 +138,7 @@ export async function batchGetStats(
       const stats = await getStatsForIp(ip, 2); // 2 retries
       results.set(address, stats);
       return { address, stats };
-    }),
+    })
   );
 
   await Promise.all(promises);

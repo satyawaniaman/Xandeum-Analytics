@@ -1,0 +1,12 @@
+{
+    "xandeum-analytics/**/*.ts": [
+        "npx --prefix xandeum-analytics eslint --fix",
+        "npx --prefix xandeum-analytics prettier --write"
+    ],
+    "xandeum-dashboard/**/*.{ts,tsx}": [
+        "npx --prefix xandeum-dashboard eslint --fix"
+    ],
+    "*.{json,md,yml,yaml}": [
+        "npx prettier --write"
+    ]
+}

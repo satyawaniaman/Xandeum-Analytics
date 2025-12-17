@@ -1,6 +1,5 @@
 import globals from "globals";
-import tseslint from "@typescript-eslint/eslint-plugin";
-import tsParser from "@typescript-eslint/parser";
+import tseslint from "typescript-eslint";
 import prettierPlugin from "eslint-plugin-prettier";
 import prettierConfig from "eslint-config-prettier";
 
@@ -8,44 +7,25 @@ import prettierConfig from "eslint-config-prettier";
 export default [
   {
     ignores: [
-      "node_modules",
-      "dist",
-      "build",
-      ".eslintignore",
-      ".gitignore",
-      "pre-commit",
-      ".prettierignore",
-      "schema.prisma",
-      "Dockerfile",
-      "docker-compose.yml",
-      ".env.copy",
-      ".env",
-      "deploy.yml",
-      "migration.sql",
-      "migration_lock.toml",
-      "init.sh",
-      ".dockerignore",
-      "LICENSE",
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      "prisma/**",
     ],
-    files: ["**/*.{js,mjs,cjs,ts,tsx}"],
+  },
+  ...tseslint.configs.recommended,
+  prettierConfig,
+  {
+    files: ["**/*.{js,mjs,cjs,ts}"],
     languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-        ecmaFeatures: {
-          jsx: true,
-        },
+      globals: {
+        ...globals.node,
       },
-      globals: globals.browser,
     },
     plugins: {
-      "@typescript-eslint": tseslint,
       prettier: prettierPlugin,
     },
     rules: {
-      ...tseslint.configs.recommended.rules,
-      ...prettierConfig.rules,
       "prettier/prettier": [
         "error",
         {
@@ -56,6 +36,7 @@ export default [
           tabWidth: 2,
         },
       ],
+      "@typescript-eslint/no-unused-vars": "warn",
     },
   },
 ];

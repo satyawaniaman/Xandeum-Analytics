@@ -38,10 +38,14 @@ export async function syncPnodesOnce() {
   }
 
   const uniquePods = Array.from(podsByIp.values());
-  logger.info(`Deduplicated to ${uniquePods.length} unique IPs (from ${pods.length} addresses)`);
+  logger.info(
+    `Deduplicated to ${uniquePods.length} unique IPs (from ${pods.length} addresses)`
+  );
 
   // Track current IPs for cleanup later
-  const currentIps = new Set(uniquePods.map((pod) => extractIpFromAddress(pod.address)));
+  const currentIps = new Set(
+    uniquePods.map((pod) => extractIpFromAddress(pod.address))
+  );
 
   // 1) Upsert base info from get-pods - keyed by IP
   await prisma.$transaction(
@@ -50,7 +54,7 @@ export async function syncPnodesOnce() {
       return prisma.pNode.upsert({
         where: { ip },
         update: {
-          address: pod.address,  // Update to latest address (IP:port)
+          address: pod.address, // Update to latest address (IP:port)
           pubkey: pod.pubkey ?? undefined,
           version: pod.version ?? undefined,
           lastSeenTimestamp: pod.last_seen_timestamp ?? undefined,
@@ -65,7 +69,7 @@ export async function syncPnodesOnce() {
           lastSeen: pod.last_seen ? new Date(pod.last_seen) : undefined,
         },
       });
-    }),
+    })
   );
 
   logger.info("Base pod info synced. Fetching detailed stats in parallel...");
@@ -125,7 +129,7 @@ export async function syncPnodesOnce() {
         await prisma.pNode.update({
           where: { ip },
           data: {
-            address,  // Update to the address we successfully contacted
+            address, // Update to the address we successfully contacted
             // Mark as seen NOW since we successfully reached the node's RPC
             lastSeenTimestamp: BigInt(nowTimestamp),
             lastSeen: now,
@@ -156,7 +160,7 @@ export async function syncPnodesOnce() {
         logger.warn({ ip, address, err }, "Failed to update stats for node");
         failCount++;
       }
-    },
+    }
   );
 
   await Promise.all(updatePromises);
@@ -175,7 +179,9 @@ export async function syncPnodesOnce() {
   });
 
   if (staleNodes.length > 0) {
-    logger.info(`Removing ${staleNodes.length} stale nodes not seen in ${STALE_NODE_RETENTION_DAYS} days...`);
+    logger.info(
+      `Removing ${staleNodes.length} stale nodes not seen in ${STALE_NODE_RETENTION_DAYS} days...`
+    );
 
     const deleteResult = await prisma.pNode.deleteMany({
       where: {
@@ -199,7 +205,6 @@ export async function syncPnodesOnce() {
       successRate: `${successRate}%`,
       durationMs: duration,
     },
-    `Sync complete in ${(duration / 1000).toFixed(2)}s`,
+    `Sync complete in ${(duration / 1000).toFixed(2)}s`
   );
 }
-

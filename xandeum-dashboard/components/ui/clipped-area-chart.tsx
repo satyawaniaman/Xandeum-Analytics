@@ -114,9 +114,8 @@ export function ClippedAreaChart() {
               fill="url(#gradient-cliped-area-mobile)"
               fillOpacity={0.4}
               stroke="var(--color-mobile)"
-              clipPath={`inset(0 ${
-                Number(chartRef.current?.getBoundingClientRect().width) - axis
-              } 0 0)`}
+              clipPath={`inset(0 ${Number(chartRef.current?.getBoundingClientRect().width) - axis
+                } 0 0)`}
             />
             <line
               x1={axis}

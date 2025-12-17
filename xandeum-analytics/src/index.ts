@@ -67,7 +67,7 @@ app.get("/health", async (c) => {
         timestamp: new Date().toISOString(),
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      503,
+      503
     );
   }
 });
@@ -95,7 +95,7 @@ app.onError((err, c) => {
       stack: err.stack,
       path: c.req.path,
     },
-    500,
+    500
   );
 });
 
@@ -136,7 +136,7 @@ async function startAutomatedSync() {
   }, SYNC_INTERVAL_MS);
 
   logger.info(
-    `Automated sync enabled: running every ${SYNC_INTERVAL_MS / 1000} seconds`,
+    `Automated sync enabled: running every ${SYNC_INTERVAL_MS / 1000} seconds`
   );
 }
 
