@@ -1,0 +1,75 @@
+---
+title: API Reference
+description: Technical reference for the Xandeum Analytics API
+---
+
+# API Reference
+
+The Xandeum Analytics API provides programmatic access to network data. All endpoints are publicly accessible unless otherwise noted.
+
+**Base URL**: `https://api.analytics.xandeum.network`
+
+## Node Endpoints
+
+### List pNodes
+Returns a paginated list of all registered nodes with their current status.
+
+`GET /pnodes`
+
+**Response Schema**:
+```json
+{
+  "summary": {
+    "total": 150,
+    "online_public": 45,
+    "online_private": 80,
+    "unknown": 25
+  },
+  "nodes": [
+    {
+      "id": "uuid-string",
+      "pubkey": "7xKXtg...",
+      "ip": "192.168.1.1",
+      "version": "1.2.3",
+      "status": "online_public",
+      "metrics": {
+        "uptime": 99.9,
+        "storage_used_gb": 500
+      }
+    }
+  ]
+}
+```
+
+### Node Details
+Get detailed historical metrics for a specific node by its identity.
+
+`GET /pnodes/:address`
+
+- **address**: Can be the IP address or Public Key (preferred).
+
+## System Endpoints
+
+### Network Stats
+Lightweight endpoint for fetching global network health.
+
+`GET /pnodes/stats`
+
+### Health Check
+Monitor the status of the analytics infrastructure itself.
+
+`GET /health`
+
+**Response**:
+```json
+{
+  "status": "healthy",
+  "services": {
+    "database": "ok",
+    "redis": "ok"
+  }
+}
+```
+
+## Authentication
+Most read-only endpoints are public. Writes (such as the reporting endpoint used by `xandminerd`) require cryptographic signatures or a restricted Bearer token (`/pnodes/sync`).

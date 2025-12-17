@@ -1,0 +1,30 @@
+---
+title: Backend & Data Collection
+description: How Xandeum collects and processes network data
+---
+
+# Backend Architecture
+
+The Xandeum Analytics backend is responsible for ingesting, validating, and serving network data. It serves as the bridge between the distributed mesh of pNodes and the public dashboard.
+
+## Data Collection Pipeline
+
+### xandminerd Reporting
+Each running `xandminerd` daemon periodically emits a heartbeat to the analytics ingress nodes. This heartbeat contains:
+1. **Identity**: The node's Public Key signed with its private key to prove ownership.
+2. **Telemetry**: Current CPU load, RAM usage, and disk space availability.
+3. **Network Info**: Current public IP and pRPC port status.
+
+### Aggregation & Verification
+The backend receives these reports and performs several checks:
+- **Signature Verification**: Validates that the report was signed by the claimed Pubkey.
+- **PoPA Validation**: Cross-references the reported location with the Proof-of-Physical-Address data stored on-chain.
+- **Liveness Tracking**: Updates the "Last Seen" timestamp. Nodes silent for more than 5 minutes are transitioned to "Not Recently Seen" status.
+
+## Storage
+Data is persisted in a hybrid storage model:
+- **TimescaleDB / PostgreSQL**: For historical metric data allowing for efficient time-series queries.
+- **Redis**: For caching real-time state and "hot" data like the current list of online nodes (TTL 30 seconds).
+
+## Identity Persistence
+The backend strictly adheres to the "Pubkey as Identity" principle. If a node reports from a new IP address but the same Public Key, the system updates the existing node record rather than creating a duplicate. This ensures historical performance data is preserved seamlessly during network migrations.

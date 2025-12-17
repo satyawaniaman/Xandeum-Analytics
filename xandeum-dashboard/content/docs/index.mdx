@@ -1,0 +1,35 @@
+---
+title: Introduction
+description: Comprehensive documentation for the Xandeum Intelligence Platform
+---
+
+# Welcome to Xandeum Intelligence
+
+The Xandeum Intelligence Platform is a comprehensive analytics and management interface for the Xandeum storage network. It provides real-time visibility into the distribution, health, and performance of storage nodes across the globe.
+
+## Network Architecture
+
+Understanding the Xandeum network requires familiarity with its core components and how they interact.
+
+### pNode (Physical Node)
+A **pNode** refers to the collective hardware infrastructure—the server itself. It includes the physical machine, CPU, memory, storage drives, and network interface. The pNode provides the raw resources required to store data and participate in the network.
+
+### pod (Software Unit)
+A **pod** is the specific piece of software that runs on top of a pNode. It is responsible for the actual storage functions, including:
+- Data replication and sharding.
+- Proof-of-Physical-Address (PoPA) verification.
+- Inter-node communication via pRPC.
+
+### xandminer
+**xandminer** is the graphical user interface (GUI) software used for local management of a node. It allows operators to configure their node, view local logs, and manage their wallet connections.
+
+### xandminerd
+**xandminerd** is the background daemon process that powers xandminer. It runs continuously on the server, collecting system metrics, handling network protocols, and feeding real-time information to the xandminer interface and the central analytics platform.
+
+## Identity Model
+
+In the Xandeum network, identity is cryptographic. We treat the **Public Key (pubkey)** as the primary identity of a node, not the IP address.
+- **Pubkey**: A permanent, cryptographic identifier derived from the node's Solana wallet. It persists even if the node changes location or network providers.
+- **IP Address**: Treated as ephemeral metadata. While we track it for geolocation maps, it is not used to uniquely identify a node for rewards or reputation.
+
+This distinction ensures that node reputation and history are tied to the operator's cryptographic signature, promoting security and allowing for flexible infrastructure management.

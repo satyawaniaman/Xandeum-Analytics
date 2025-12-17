@@ -4,6 +4,7 @@ import { ChartLineIcon } from "@/components/ui/chart-line";
 import { SettingsIcon } from "@/components/ui/settings";
 import { ArrowLeftRightIcon } from "@/components/ui/arrow-left-right";
 import { ComponentType } from "react";
+import { BookOpenIcon } from "@/components/ui/book-open";
 
 type Submenu = {
     href: string;
@@ -53,7 +54,6 @@ export function getMenuList(_pathname: string): Group[] {
                     label: "Nodes",
                     icon: MonitorCheckIcon
                 }
-
             ]
         },
         {
@@ -63,6 +63,16 @@ export function getMenuList(_pathname: string): Group[] {
                     href: "/dashboard/trade",
                     label: "Trade XAND",
                     icon: ArrowLeftRightIcon
+                }
+            ]
+        },
+        {
+            groupLabel: "Resources",
+            menus: [
+                {
+                    href: "/docs",
+                    label: "Documentation",
+                    icon: BookOpenIcon
                 }
             ]
         },

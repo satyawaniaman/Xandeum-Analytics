@@ -1,0 +1,33 @@
+---
+title: Token Swaps & Pricing
+description: Integrated trading features powered by Jupiter
+---
+
+# Token Swaps
+
+The dashboard includes a fully integrated Decentralized Exchange (DEX) interface, allowing users to acquire XAND tokens directly within the platform. This feature is powered by **Jupiter**, the leading liquidity aggregator on Solana.
+
+## Integration Architecture
+
+### Jupiter Ultra API
+We utilize the **Jupiter V6/Ultra API** to fetch the most efficient swap routes.
+- **Liquidity Aggregation**: Jupiter scans multiple DEXs (Orca, Raydium, Meteora, etc.) to find the best price for XAND.
+- **Smart Routing**: Trades may be split across multiple pools to minimize price impact and slippage.
+
+### Fee Structure
+- **Platform Fee**: A 0.20% (20 BPS) platform fee is applied to swaps executed through the dashboard.
+- **Fee Collector**: These fees are routed to the project's treasury wallet (`2gAwq...`) to support ongoing development.
+- **Transparency**: The exact fee amount and the estimated output are displayed clearly before signing any transaction.
+
+### Pricing Data
+Real-time price feeds for XAND and other assets are sourced directly from the Jupiter Price API. We calculate:
+- **USD Price**: derived from USDC pair liquidity.
+- **Market Cap**: derived from circulating supply estimates.
+- **24h Volume**: aggregated volume across all major pools.
+
+## Supported Wallets
+The swap interface supports all major Solana wallets via the Unified Wallet Adapter:
+- Phantom
+- Solflare
+- Backpack
+- Ledger (via hardware connection)

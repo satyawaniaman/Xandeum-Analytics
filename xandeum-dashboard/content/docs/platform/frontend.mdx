@@ -1,0 +1,28 @@
+---
+title: Dashboard Interface
+description: Overview of the Xandeum Analytics Dashboard features
+---
+
+# Dashboard Interface
+
+The Xandeum Dashboard acts as the primary visual interface for the network. It aggregates data from hundreds of decentralized pNodes to provide a cohesive view of the network's state.
+
+## Core Features
+
+### Network Overview
+The landing page provides a high-level snapshot of the ecosystem:
+- **Global Map**: A vector-based visualization using `react-simple-maps` to show the geographic distribution of nodes. It clusters nodes by region to prevent clutter.
+- **Status Distribution**: A donut chart breaking down nodes by their operational status (Public RPC, Private, Not Recently Seen).
+- **Metric Summaries**: Aggregated cards showing total storage capacity, active nodes, and network throughput.
+
+### Node Details
+Clicking on any specific node (identified by its Public Key) reveals a deep-dive view:
+- **Performance Gauge**: A visual speedometer indicating the node's health score based on uptime and resource availability.
+- **Resource Charts**: Time-series area charts visualizing CPU usage, Memory consumption, and Storage growth over time.
+- **Hardware Specs**: Detailed verified specifications including CPU model, RAM total, and Disk type.
+
+## Data Visualization
+We prioritize clarity and precision in our visualizations (using Recharts):
+- **No Emojis**: We avoid decorative emojis in metric labels to maintain a professional, clean aesthetic suitable for technical analysis.
+- **Precision**: Percentages are displayed to two decimal places where meaningful.
+- **Timeframes**: Charts support multiple timeframes (24h, 7d, 30d) to analyze both short-term anomalies and long-term trends.
