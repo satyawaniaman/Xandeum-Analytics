@@ -10,16 +10,16 @@ interface StatusDonutProps {
 }
 
 const COLORS = {
-    online_public: "#10b981",  // Emerald
-    online_private: "#f59e0b", // Amber
-    offline: "#ef4444",        // Red
-    unknown: "#71717a",        // Zinc
+    online_public: "#10b981",  // Emerald - Public RPC accessible
+    online_private: "#3b82f6", // Blue - Private (not negative)
+    offline: "#71717a",        // Zinc (neutral) - Not recently seen
+    unknown: "#a1a1aa",        // Lighter zinc
 };
 
 const LABELS = {
-    online_public: "Online (Public)",
-    online_private: "Online (Private)",
-    offline: "Offline",
+    online_public: "Public RPC",
+    online_private: "Private",
+    offline: "Not Recently Seen",
     unknown: "Unknown",
 };
 

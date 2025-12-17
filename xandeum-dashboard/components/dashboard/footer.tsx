@@ -65,6 +65,12 @@ export function DashboardFooter() {
                         <span>Read the Docs</span>
                     </Link>
 
+                    {/* Community Disclaimer */}
+                    <div className="mt-2 text-center text-muted-foreground/60 text-[10px] max-w-md">
+                        Community-built analytics dashboard for the Xandeum network.
+                        Not affiliated with Xandeum Labs.
+                    </div>
+
                     {/* Powered By */}
                     <div className="mt-1 text-muted-foreground/70">
                         Powered by <span className="text-muted-foreground font-medium">Solana</span>

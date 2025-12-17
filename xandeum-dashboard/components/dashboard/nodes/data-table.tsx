@@ -162,9 +162,9 @@ export function DataTable({ nodes }: DataTableProps) {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Status</SelectItem>
-                            <SelectItem value="online_public">Online (Public)</SelectItem>
-                            <SelectItem value="online_private">Online (Private)</SelectItem>
-                            <SelectItem value="offline">Offline</SelectItem>
+                            <SelectItem value="online_public">Public RPC</SelectItem>
+                            <SelectItem value="online_private">Private</SelectItem>
+                            <SelectItem value="offline">Not Recently Seen</SelectItem>
                         </SelectContent>
                     </Select>
 

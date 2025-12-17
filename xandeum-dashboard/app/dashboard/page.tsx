@@ -108,10 +108,9 @@ export default function DashboardPage() {
                     // variant="warning"
                     />
                     <StatCard
-                        title="Offline"
+                        title="Not Recently Seen"
                         value={summary.offline}
-                        subtitle={summary.offline > 0 ? "Needs attention" : "All nodes healthy"}
-                    // variant={summary.offline > 0 ? "danger" : "default"}
+                        subtitle={`Last seen >5 min ago`}
                     />
                 </div>
 

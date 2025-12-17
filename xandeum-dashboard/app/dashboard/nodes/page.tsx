@@ -14,7 +14,7 @@ import { usePNodes } from "@/hooks/use-pnodes";
 import { DataTable } from "@/components/dashboard/nodes/data-table";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MonitorCheckIcon } from "lucide-react"; // Using lucide directly as MonitorCheckIcon component might be custom wrapper
+import { MonitorCheckIcon } from "lucide-react";
 import { exportNodes } from "@/lib/export-utils";
 
 export default function NodesPage() {
