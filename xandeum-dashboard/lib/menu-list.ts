@@ -44,15 +44,16 @@ export function getMenuList(_pathname: string): Group[] {
             groupLabel: "pNodes",
             menus: [
                 {
-                    href: "/dashboard/nodes",
-                    label: "All Nodes",
-                    icon: MonitorCheckIcon
+                    href: "/dashboard/network",
+                    label: "Network",
+                    icon: ChartLineIcon
                 },
                 {
-                    href: "/dashboard/analytics",
-                    label: "Analytics",
-                    icon: ChartLineIcon
+                    href: "/dashboard/nodes",
+                    label: "Nodes",
+                    icon: MonitorCheckIcon
                 }
+
             ]
         },
         {
