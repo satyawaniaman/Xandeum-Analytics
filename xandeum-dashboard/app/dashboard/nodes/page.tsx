@@ -15,12 +15,19 @@ import { DataTable } from "@/components/dashboard/nodes/data-table";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MonitorCheckIcon } from "lucide-react"; // Using lucide directly as MonitorCheckIcon component might be custom wrapper
+import { exportNodes } from "@/lib/export-utils";
 
 export default function NodesPage() {
     const { data, isLoading, error, refetch } = usePNodes();
 
     const handleRefresh = () => {
         refetch();
+    };
+
+    const handleExport = (format: "json" | "csv") => {
+        if (data?.nodes) {
+            exportNodes(data.nodes, format);
+        }
     };
 
     if (error) {
@@ -67,7 +74,7 @@ export default function NodesPage() {
     const avgUptimeDays = Math.floor(avgUptimeSeconds / 86400);
 
     return (
-        <ContentLayout title="All Nodes" onRefresh={handleRefresh}>
+        <ContentLayout title="All Nodes" onRefresh={handleRefresh} onExport={handleExport}>
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>

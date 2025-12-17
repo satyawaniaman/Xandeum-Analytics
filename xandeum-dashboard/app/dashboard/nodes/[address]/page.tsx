@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { ContentLayout } from "@/components/dashboard-panel/content-layout";
 import {
@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { usePNodeDetail } from "@/hooks/use-pnodes";
+import { useWatchlist } from "@/hooks/use-watchlist";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import {
     Activity,
@@ -29,9 +30,18 @@ import {
     Terminal,
     Copy,
     Check,
-    ExternalLink
+    ExternalLink,
+    Star,
+    Twitter
 } from "lucide-react";
 import { SingleNodeMap } from "@/components/dashboard/nodes/single-node-map";
+import { generatePulseReport, generateTwitterShareUrl } from "@/lib/share-utils";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function NodeDetailPage({ params }: { params: Promise<{ address: string }> }) {
     // Unwrap params using use() hook for Next.js 15+ (if applicable) or standard await in component if async
@@ -42,7 +52,9 @@ export default function NodeDetailPage({ params }: { params: Promise<{ address: 
     const decodedAddress = decodeURIComponent(resolvedParams.address);
 
     const { data: node, isLoading, error, refetch } = usePNodeDetail(decodedAddress);
+    const { isWatched, toggleWatchlist } = useWatchlist();
     const [isCopied, setIsCopied] = useState(false);
+    const [isStatsCopied, setIsStatsCopied] = useState(false);
 
     const copyToClipboard = async (text: string) => {
         try {
@@ -54,6 +66,29 @@ export default function NodeDetailPage({ params }: { params: Promise<{ address: 
         }
     };
 
+    const copyStatsToClipboard = async () => {
+        if (!node) return;
+        try {
+            const report = generatePulseReport(node);
+            await navigator.clipboard.writeText(report);
+            setIsStatsCopied(true);
+            setTimeout(() => setIsStatsCopied(false), 2000);
+        } catch (err) {
+            console.error("Failed to copy stats:", err);
+        }
+    };
+
+    const shareOnTwitter = () => {
+        if (!node) return;
+        const url = generateTwitterShareUrl(node);
+        window.open(url, "_blank", "noopener,noreferrer");
+    };
+
+    const handleWatchlistToggle = () => {
+        if (!node) return;
+        toggleWatchlist(node.address);
+    };
+
     const formatBytes = (bytes: number | null) => {
         if (bytes === null) return "—";
         if (bytes === 0) return "0 B";
@@ -62,6 +97,8 @@ export default function NodeDetailPage({ params }: { params: Promise<{ address: 
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
     };
+
+    const nodeIsWatched = node ? isWatched(node.address) : false;
 
     if (error) {
         return (
@@ -143,8 +180,72 @@ export default function NodeDetailPage({ params }: { params: Promise<{ address: 
                             </div>
                         </div>
                     </div>
-                    <div className="flex gap-3">
-                        {/* Action buttons could go here */}
+                    <div className="flex gap-2">
+                        <TooltipProvider>
+                            {/* Share on X Button */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={shareOnTwitter}
+                                        className="gap-2 hover:bg-primary/10 hover:border-primary/50 transition-all"
+                                    >
+                                        <Twitter size={16} />
+                                        <span className="hidden sm:inline">Share</span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Share node stats on X (Twitter)</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            {/* Copy Stats Button */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={copyStatsToClipboard}
+                                        className={`gap-2 transition-all ${isStatsCopied
+                                                ? "bg-green-500/10 border-green-500/50 text-green-500"
+                                                : "hover:bg-primary/10 hover:border-primary/50"
+                                            }`}
+                                    >
+                                        {isStatsCopied ? <Check size={16} /> : <Copy size={16} />}
+                                        <span className="hidden sm:inline">
+                                            {isStatsCopied ? "Copied!" : "Copy Stats"}
+                                        </span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Copy pulse report to clipboard</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            {/* Watchlist Toggle Button */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleWatchlistToggle}
+                                        className={`gap-2 transition-all ${nodeIsWatched
+                                                ? "bg-yellow-500/10 border-yellow-500/50 text-yellow-500"
+                                                : "hover:bg-primary/10 hover:border-primary/50"
+                                            }`}
+                                    >
+                                        <Star size={16} className={nodeIsWatched ? "fill-current" : ""} />
+                                        <span className="hidden sm:inline">
+                                            {nodeIsWatched ? "Watching" : "Watch"}
+                                        </span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{nodeIsWatched ? "Remove from watchlist" : "Add to watchlist"}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 </div>
 

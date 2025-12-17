@@ -10,6 +10,7 @@ import { NetworkHealthGauge } from "@/components/dashboard/network-health-gauge"
 import { NodeMap } from "@/components/dashboard/node-map";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MonitorCheckIcon } from "@/components/ui/monitor-check";
+import { exportNodes } from "@/lib/export-utils";
 
 export default function DashboardPage() {
     const { data, isLoading, error, refetch, isFetching } = usePNodes();
@@ -24,6 +25,12 @@ export default function DashboardPage() {
 
     const handleRefresh = () => {
         refetch();
+    };
+
+    const handleExport = (format: "json" | "csv") => {
+        if (data?.nodes) {
+            exportNodes(data.nodes, format);
+        }
     };
 
     if (isLoading) {
@@ -73,7 +80,7 @@ export default function DashboardPage() {
     const onlineCount = summary.online_public + summary.online_private;
 
     return (
-        <ContentLayout title="Dashboard" onRefresh={handleRefresh} networkStatus={getNetworkStatus()}>
+        <ContentLayout title="Dashboard" onRefresh={handleRefresh} onExport={handleExport} networkStatus={getNetworkStatus()}>
             <div className="space-y-6">
                 {/* KPI Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
