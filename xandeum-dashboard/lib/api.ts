@@ -2,11 +2,21 @@ import { GetPNodesResponse, GetPNodesStatsResponse, GetHealthResponse, PNode } f
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
+// Use proxy in browser to avoid CORS, direct URL for server-side
+function getApiUrl(path: string): string {
+    if (typeof window !== "undefined") {
+        // Client-side: use proxy
+        return `/api/proxy?path=${encodeURIComponent(path)}`;
+    }
+    // Server-side: direct call
+    return `${API_BASE_URL}${path}`;
+}
+
 /**
  * Fetch all pNodes with summary
  */
 export async function fetchPNodes(): Promise<GetPNodesResponse> {
-    const response = await fetch(`${API_BASE_URL}/pnodes`, {
+    const response = await fetch(getApiUrl("/pnodes"), {
         cache: "no-store",
     });
 
@@ -21,7 +31,7 @@ export async function fetchPNodes(): Promise<GetPNodesResponse> {
  * Fetch pNodes stats summary only
  */
 export async function fetchPNodesStats(): Promise<GetPNodesStatsResponse> {
-    const response = await fetch(`${API_BASE_URL}/pnodes/stats`, {
+    const response = await fetch(getApiUrl("/pnodes/stats"), {
         cache: "no-store",
     });
 
@@ -41,7 +51,7 @@ export async function fetchPNodeByAddress(address: string): Promise<PNode> {
     const ip = address.includes(":") ? address.split(":")[0] : address;
     const encodedAddress = encodeURIComponent(ip);
 
-    const response = await fetch(`${API_BASE_URL}/pnodes/${encodedAddress}`, {
+    const response = await fetch(getApiUrl(`/pnodes/${encodedAddress}`), {
         cache: "no-store",
     });
 
@@ -56,7 +66,7 @@ export async function fetchPNodeByAddress(address: string): Promise<PNode> {
  * Fetch API health status
  */
 export async function fetchHealth(): Promise<GetHealthResponse> {
-    const response = await fetch(`${API_BASE_URL}/health`, {
+    const response = await fetch(getApiUrl("/health"), {
         cache: "no-store",
     });
 
@@ -79,7 +89,7 @@ export async function triggerSync(token?: string): Promise<{ ok: boolean; messag
         headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_BASE_URL}/pnodes/sync`, {
+    const response = await fetch(getApiUrl("/pnodes/sync"), {
         method: "POST",
         headers,
     });
