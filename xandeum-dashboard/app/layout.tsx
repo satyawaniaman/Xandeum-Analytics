@@ -3,7 +3,7 @@ import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { WalletProvider } from "@/components/providers/wallet-provider";
-
+import { Analytics } from "@vercel/analytics/next"
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
@@ -46,6 +46,7 @@ export default function RootLayout({
         <Providers>
           <WalletProvider>
             {children}
+            <Analytics />
             <Toaster />
           </WalletProvider>
         </Providers>
