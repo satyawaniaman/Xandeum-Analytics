@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AIChatDrawer } from "@/components/ai-chat-drawer";
 
 interface NavbarProps {
   title: string;
@@ -139,7 +140,8 @@ export function Navbar({ title, onRefresh, onSearch, onExport, networkStatus = "
             </Button>
           </div>
 
-
+          {/* Ask AI Button */}
+          <AIChatDrawer />
 
           <ModeToggle />
         </div>
