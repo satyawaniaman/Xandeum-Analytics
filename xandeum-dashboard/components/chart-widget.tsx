@@ -1,14 +1,35 @@
 "use client";
 
-import React, { useEffect, useRef, memo } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import { useTheme } from 'next-themes';
 
 function TradingViewWidget() {
     const container = useRef<HTMLDivElement>(null);
     const { resolvedTheme, theme } = useTheme();
+    const [isXandeumTheme, setIsXandeumTheme] = useState(false);
 
     // Determine if dark mode - handle SSR by defaulting to dark
     const isDark = resolvedTheme === 'dark' || theme === 'dark' || typeof window === 'undefined';
+
+    // Detect Xandeum theme
+    useEffect(() => {
+        const checkTheme = () => {
+            const isXandeum = document.documentElement.classList.contains("theme-xandeum") ||
+                localStorage.getItem("xandeum-theme-preference") === "xandeum";
+            setIsXandeumTheme(isXandeum);
+        };
+
+        checkTheme();
+
+        // Listen for theme changes
+        const handleThemeChange = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            setIsXandeumTheme(customEvent.detail.active);
+        };
+
+        window.addEventListener("xandeum-theme-change", handleThemeChange);
+        return () => window.removeEventListener("xandeum-theme-change", handleThemeChange);
+    }, []);
 
     useEffect(() => {
         if (!container.current) return;
@@ -22,6 +43,12 @@ function TradingViewWidget() {
         // Remove any existing scripts
         const existingScripts = container.current.querySelectorAll('script');
         existingScripts.forEach(s => s.remove());
+
+        // Compute colors directly in effect
+        const backgroundColor = isXandeumTheme ? "#08113B" : (isDark ? "#171717" : "#ffffff");
+        const gridColor = isXandeumTheme
+            ? "rgba(25, 132, 118, 0.15)"
+            : (isDark ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.06)");
 
         const script = document.createElement("script");
         script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
@@ -41,10 +68,10 @@ function TradingViewWidget() {
             "save_image": true,
             "style": "1",
             "symbol": "RAYDIUMCPMM:XANDSOL_C9ZJUG",
-            "theme": isDark ? "dark" : "light",
+            "theme": (isDark || isXandeumTheme) ? "dark" : "light",
             "timezone": "Etc/UTC",
-            "backgroundColor": isDark ? "#171717" : "#ffffff",
-            "gridColor": isDark ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.06)",
+            "backgroundColor": backgroundColor,
+            "gridColor": gridColor,
             "watchlist": [],
             "withdateranges": false,
             "compareSymbols": [],
@@ -60,7 +87,7 @@ function TradingViewWidget() {
                 scripts.forEach(s => s.remove());
             }
         };
-    }, [isDark]);
+    }, [isDark, isXandeumTheme]);
 
     return (
         <div
