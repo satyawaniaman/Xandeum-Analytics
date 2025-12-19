@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Xandeum Dashboard",
     description: "Real-time analytics and monitoring for Xandeum pNodes.",
-    url: "https://analytics.xandeum.network",
+    url: "https://xandeumstats.xyz",
     siteName: "Xandeum Analytics",
     images: [
       {
