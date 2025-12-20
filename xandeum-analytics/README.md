@@ -1,43 +1,127 @@
-# Hono API Template
+# Xandeum Analytics Backend
 
-The all in one service template with prisma, postgresql and redis cache setup. Includes a CI/CD pipeline to deploy to a VPS via a docker compose.
+High-performance API service that powers the Xandeum pNode Analytics Platform.
 
-## Tech stack
+## 🎯 What It Does
 
-- [Hono](https://hono.dev/) -> api framework
-- [Prisma](https://www.prisma.io/) -> orm
-- [Postgresql](https://www.postgresql.org/) -> database
-- [Redis](https://redis.io/) -> database caching
-- [Prettier](https://prettier.io/) -> code formatting
-- [ESLint](https://eslint.org/) -> linter and code integrity checker
-- [Zod](https://zod.dev/) -> typescript form validation
-- [Husky](https://typicode.github.io/husky/) -> pre commit hooks
+1. **Syncs pNode Data** - Fetches node info from pRPC every 30 seconds
+2. **Aggregates Stats** - CPU, RAM, storage, uptime, versions
+3. **Geo-locates Nodes** - IP-based country/city lookup
+4. **Caches Responses** - Redis caching for fast API responses
+5. **Serves REST API** - Clean endpoints for the dashboard
 
-## Project Structure
+## 🛠️ Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| Framework | [Hono](https://hono.dev) |
+| ORM | [Prisma](https://prisma.io) |
+| Database | PostgreSQL (DigitalOcean) |
+| Cache | Redis (Upstash) |
+| Validation | Zod + OpenAPI |
+| Logging | Pino |
+| Process Mgr | PM2 |
+
+## 📡 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Service health check |
+| `/pnodes` | GET | All nodes with stats |
+| `/pnodes/stats` | GET | Network summary only |
+| `/pnodes/:ip` | GET | Single node details |
+| `/pnodes/sync` | POST | Manual sync trigger |
+| `/pnodes/cleanup` | POST | Remove stale nodes |
+
+### Example Response
+
+```json
+GET /pnodes/stats
+{
+  "total": 232,
+  "online": 188,
+  "with_public_rpc": 37,
+  "timestamp": "2025-12-20T09:10:52.468Z"
+}
+```
+
+## ⚙️ Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | ✅ | PostgreSQL connection string |
+| `UPSTASH_REDIS_REST_URL` | ✅ | Upstash Redis URL |
+| `UPSTASH_REDIS_REST_TOKEN` | ✅ | Upstash Redis token |
+| `PRPC_URL` | ✅ | pRPC endpoint |
+| `PORT` | ❌ | Server port (default: 3000) |
+| `SYNC_TOKEN` | ❌ | Auth token for sync endpoint |
+
+## 🚀 Quick Start
+
+```bash
+# Install
+pnpm install
+
+# Configure
+cp .env.example .env
+
+# Migrate database
+pnpm migrate
+
+# Development
+pnpm dev
+
+# Production
+pnpm build && pnpm start
+```
+
+## 📦 Deployment
+
+Deployed on DigitalOcean VM with PM2:
+
+```bash
+# On server
+./deploy.sh
+
+# Manual
+pm2 restart xandeum-analytics
+pm2 logs xandeum-analytics
+```
+
+## 🔄 Sync Architecture
 
 ```
-.
-├── docker-compose.yml
-├── Dockerfile
-├── eslint.config.js
-├── init.sh
-├── lint-staged.config.js
-├── package.json
-├── pnpm-lock.yaml
-├── prisma
-│   ├── migrations
-│   │   └── migration_lock.toml
-│   └── schema.prisma
-├── README.md
-├── src
-│   ├── index.ts
-│   ├── lib
-│   │   ├── prisma-client.ts
-│   │   └── redis-client.ts
-│   ├── routes
-│   │   └── sample
-│   │       ├── index.ts
-│   │       └── routes.ts
-│   └── utils
-└── tsconfig.json
+Every 30 seconds:
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│    pRPC     │ ──▶ │    Sync     │ ──▶ │  PostgreSQL │
+│ (gossip)    │     │   Service   │     │  (persist)  │
+└─────────────┘     └─────────────┘     └─────────────┘
+                          │
+                          ▼
+                    ┌─────────────┐
+                    │    Redis    │
+                    │   (cache)   │
+                    └─────────────┘
+```
+
+## 📊 Database Schema
+
+```prisma
+model PNode {
+  id                String    @id @default(uuid())
+  ip                String    @unique
+  address           String
+  pubkey            String?
+  version           String?
+  lastSeenTimestamp BigInt?
+  cpuPercent        Float?
+  ramUsedBytes      BigInt?
+  ramTotalBytes     BigInt?
+  totalBytes        BigInt?
+  uptimeSeconds     Int?
+  latitude          Float?
+  longitude         Float?
+  country           String?
+  city              String?
+}
 ```

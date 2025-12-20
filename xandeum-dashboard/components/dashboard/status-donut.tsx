@@ -65,7 +65,8 @@ export function StatusDonut({ summary, className }: StatusDonutProps) {
                                         border: "1px solid #3f3f46",
                                         borderRadius: "8px",
                                     }}
-                                    labelStyle={{ color: "#a1a1aa" }}
+                                    labelStyle={{ color: "#fafafa" }}
+                                    itemStyle={{ color: "#e4e4e7" }}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
@@ -77,7 +78,7 @@ export function StatusDonut({ summary, className }: StatusDonutProps) {
                                     className="h-3 w-3 rounded-full"
                                     style={{ backgroundColor: COLORS[item.key as keyof typeof COLORS] }}
                                 />
-                                <span className="text-sm text-muted-foreground">{item.name}</span>
+                                <span className="text-sm text-foreground">{item.name}</span>
                                 <span className="ml-auto text-sm font-medium text-foreground">
                                     {item.value}
                                 </span>

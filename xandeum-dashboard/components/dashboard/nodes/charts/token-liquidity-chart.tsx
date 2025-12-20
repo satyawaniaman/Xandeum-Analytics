@@ -32,7 +32,7 @@ export function TokenLiquidityChart({ data, currentLiquidity, change24h }: Token
     const [axis, setAxis] = useState(0);
     const [chartWidth, setChartWidth] = useState(0);
 
-    // motion values - declared before useEffect that uses them
+    // motion values for smooth animations
     const springX = useSpring(0, {
         damping: 30,
         stiffness: 100,
@@ -42,17 +42,36 @@ export function TokenLiquidityChart({ data, currentLiquidity, change24h }: Token
         stiffness: 100,
     });
 
+    // Use ResizeObserver to detect when chart becomes visible with real dimensions
     useEffect(() => {
-        if (chartRef.current) {
-            const width = chartRef.current.getBoundingClientRect().width;
+        if (!chartRef.current) return;
+
+        const observer = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const width = entry.contentRect.width;
+                if (width > 0) {
+                    setChartWidth(width);
+                    setAxis(width);
+                    springX.jump(width);
+                }
+            }
+        });
+
+        observer.observe(chartRef.current);
+
+        // Also check immediately in case it's already visible
+        const width = chartRef.current.getBoundingClientRect().width;
+        if (width > 0) {
             setChartWidth(width);
-            setAxis(width); // Initialize to full width so chart shows filled
+            setAxis(width);
             springX.jump(width);
         }
+
+        return () => observer.disconnect();
     }, [springX]);
 
     useMotionValueEvent(springX, "change", (latest) => {
-        setAxis(latest);
+        setAxis(latest as number);
     });
 
     const isPositive = change24h >= 0;

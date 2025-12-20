@@ -1,0 +1,95 @@
+export const metadata = {
+  title: 'Xandbot AI Assistant',
+  description: 'AI-powered assistant for Xandeum questions',
+};
+
+# Xandbot AI Assistant
+
+**Xandbot** is an AI-powered assistant integrated into the dashboard. It can answer questions about the Xandeum network, pNodes, tokens, and more.
+
+## How to Use
+
+1. Click the **"Ask AI"** button in the navigation bar
+2. A chat drawer opens on the right side
+3. Type your question and press Enter
+4. Xandbot responds with helpful information
+
+## What Xandbot Knows
+
+Xandbot is trained on:
+
+- **Official Xandeum Documentation** — Network architecture, pNodes, pods, staking
+- **Real-time Network Data** — Current node count, online status, versions
+- **Token Information** — XAND price, liquidity, market data
+- **Platform Features** — How to use the dashboard, swap tokens, etc.
+
+## Example Questions
+
+Try asking Xandbot:
+
+- "What is a pNode?"
+- "How many nodes are currently online?"
+- "What is the current XAND price?"
+- "How do I run a pod on my server?"
+- "What is Proof of Physical Address?"
+- "How are pod credits calculated?"
+
+## Topic Restrictions
+
+Xandbot is **strictly focused on Xandeum topics**. It will politely decline to answer questions about:
+
+- General AI/ChatGPT topics
+- Non-Xandeum cryptocurrencies
+- Personal advice or opinions
+- Unrelated technical questions
+
+This keeps responses focused and relevant.
+
+## Technical Details
+
+### Architecture
+
+<img height="500" width="500" src="/xandbot-image.png" alt="Xandeum Xandbot Architecture" className="rounded-lg border border-border my-6" />
+
+### Model
+
+Xandbot uses **Google Gemini** (`gemini-2.0-flash`) via the Vercel AI SDK:
+
+- Fast streaming responses
+- Context-aware conversations
+- Cost-effective API usage
+
+### Rate Limiting
+
+To prevent abuse, Xandbot enforces:
+
+- **10 requests per minute** per user
+- Cooldown period if limit exceeded
+- Rate limit resets every 60 seconds
+
+### Context Injection
+
+Each request includes:
+
+1. **Documentation** — Loaded from `lib/xandeum-docs.md`
+2. **Live Stats** — Current network data from API
+3. **Token Data** — XAND price and liquidity
+
+This ensures Xandbot has up-to-date information.
+
+## Privacy
+
+- Conversations are **not stored** on our servers
+- No personal data is collected
+- API requests go directly to Google's servers
+
+## Troubleshooting
+
+### "Resource exhausted" error
+The Gemini API has quota limits. Wait a few minutes and try again.
+
+### Slow responses
+Large context (documentation) can slow initial responses. Subsequent messages are faster.
+
+### Off-topic responses
+If Xandbot goes off-topic, try rephrasing your question to be more Xandeum-specific.

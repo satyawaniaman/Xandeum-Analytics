@@ -1,28 +1,157 @@
 export const metadata = {
-  title: 'Dashboard Interface',
-  description: 'Overview of the Xandeum Analytics Dashboard features',
+  title: 'Dashboard Features',
+  description: 'Guide to the Xandeum Analytics Dashboard interface',
 };
 
-# Dashboard Interface
+# Dashboard Features
 
-The Xandeum Dashboard acts as the primary visual interface for the network. It aggregates data from hundreds of decentralized pNodes to provide a cohesive view of the network's state.
+The dashboard provides a comprehensive view of the Xandeum network through several key features.
 
-## Core Features
+## Main Overview
 
-### Network Overview
-The landing page provides a high-level snapshot of the ecosystem:
-- **Global Map**: A vector-based visualization using `react-simple-maps` to show the geographic distribution of nodes. It clusters nodes by region to prevent clutter.
-- **Status Distribution**: A donut chart breaking down nodes by their operational status (Public RPC, Private, Not Recently Seen).
-- **Metric Summaries**: Aggregated cards showing total storage capacity, active nodes, and network throughput.
+The landing page at `/dashboard` provides a high-level snapshot:
 
-### Node Details
-Clicking on any specific node (identified by its Public Key) reveals a deep-dive view:
-- **Performance Gauge**: A visual speedometer indicating the node's health score based on uptime and resource availability.
-- **Resource Charts**: Time-series area charts visualizing CPU usage, Memory consumption, and Storage growth over time.
-- **Hardware Specs**: Detailed verified specifications including CPU model, RAM total, and Disk type.
+### Network Stats
+Four animated stat cards showing:
+- **Total Nodes** — All registered pNodes
+- **Online Nodes** — Currently active nodes
+- **Public RPC** — Nodes with accessible RPC endpoints
+- **Network Health** — Calculated from multiple factors
 
-## Data Visualization
-We prioritize clarity and precision in our visualizations (using Recharts):
-- **No Emojis**: We avoid decorative emojis in metric labels to maintain a professional, clean aesthetic suitable for technical analysis.
-- **Precision**: Percentages are displayed to two decimal places where meaningful.
-- **Timeframes**: Charts support multiple timeframes (24h, 7d, 30d) to analyze both short-term anomalies and long-term trends.
+### Interactive Map
+A vector-based world map showing:
+- **Node Locations** — Dots for each node
+- **Clustering** — Groups nearby nodes to prevent clutter
+- **Tooltips** — Hover to see node count per region
+- **Click to Explore** — View nodes in each area
+
+### Status Distribution
+A donut chart breaking down nodes by status:
+- **Public RPC** — Accessible RPC, fully monitored
+- **Private** — Online but RPC not accessible
+- **Not Recently Seen** — No heartbeat in 5+ minutes
+- **Unknown** — Status couldn't be determined
+
+---
+
+## Node List
+
+The `/dashboard/nodes` page shows all nodes in a searchable table:
+
+### Features
+- **Search** — Find nodes by IP, pubkey, or country
+- **Sort** — Click column headers to sort
+- **Filter** — Coming soon: filter by status, version, country
+- **Pagination** — Large lists are paginated
+
+### Columns
+
+<table>
+  <thead>
+    <tr>
+      <th>Column</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Address</td>
+      <td>IP and port</td>
+    </tr>
+    <tr>
+      <td>Status</td>
+      <td>Current status with color badge</td>
+    </tr>
+    <tr>
+      <td>Version</td>
+      <td>Software version</td>
+    </tr>
+    <tr>
+      <td>Country</td>
+      <td>Geo-located country</td>
+    </tr>
+    <tr>
+      <td>Last Seen</td>
+      <td>Time since last heartbeat</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## Node Details
+
+Click any node to view its dedicated page at `/dashboard/nodes/:ip`:
+
+### Information Displayed
+- **Credit Score** — Lifetime pod credits
+- **Network Rank** — Position among all nodes
+- **Performance Tier** — Elite, High, Good, Average
+- **Hardware Specs** — CPU, RAM, storage capacity
+- **Network Traffic** — Packets sent/received, streams
+- **Uptime** — How long the node has been running
+- **Location** — Country and city with map
+
+### Charts
+- **CPU Usage** — Historical CPU utilization
+- **Memory Usage** — RAM consumption over time
+- **Storage** — Disk usage trends
+
+---
+
+## Network Analytics
+
+The `/dashboard/network` page provides deeper analytics:
+
+### Overview Tab
+- **XAND Price Chart** — 24-hour price history
+- **Liquidity Chart** — Total liquidity over time
+- **Version Distribution** — Pie chart of software versions
+- **Country Distribution** — Bar chart of nodes by country
+
+### Performance Tab
+- **Network Performance** — Aggregate throughput metrics
+- **Coming Soon** — Historical trends, comparisons
+
+---
+
+## Theming
+
+Access theme settings from the navbar:
+
+<table>
+  <thead>
+    <tr>
+      <th>Theme</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Light</strong></td>
+      <td>Clean white interface</td>
+    </tr>
+    <tr>
+      <td><strong>Dark</strong></td>
+      <td>Dark mode for low light</td>
+    </tr>
+    <tr>
+      <td><strong>System</strong></td>
+      <td>Follows OS preference</td>
+    </tr>
+    <tr>
+      <td><strong>Xandeum</strong></td>
+      <td>Custom brand colors with decorative background</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## Mobile Support
+
+The dashboard is fully responsive:
+- **Collapsible Sidebar** — Opens as a drawer on mobile
+- **Stacked Cards** — Single column layout
+- **Touch-Friendly** — Larger tap targets
+- **Swipe Gestures** — Swipe to close drawers

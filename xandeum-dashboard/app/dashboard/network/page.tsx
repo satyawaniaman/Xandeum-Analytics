@@ -12,21 +12,24 @@ import { MiniNodesTable } from "@/components/dashboard/mini-nodes-table";
 import { ContentLayout } from "@/components/dashboard-panel/content-layout";
 import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { NumberTicker } from "@/components/ui/number-ticker";
 import { Users, Hash, Coins, TrendingUp, TrendingDown, Zap } from "lucide-react";
 import { useMemo } from "react";
 
 export default function NetworkPage() {
-    const { data } = usePNodes();
+    const { data, isLoading } = usePNodes();
     const nodes = data?.nodes;
-    const { data: tokenData } = useXandeumToken();
+    const { data: tokenData, isLoading: tokenLoading } = useXandeumToken();
 
     // -- Calculate Network Stats --
     const networkStats = useMemo(() => {
-        if (!nodes) return { total: 0, online: 0, countryData: [], versionData: [] };
+        if (!nodes) return { total: 0, online: 0, countryData: [], versionData: [], networkTraffic: 0, activeStreams: 0 };
 
         const total = nodes.length;
         const online = nodes.filter(n => n.status === "online_public" || n.status === "online_private").length;
+        const networkTraffic = nodes.reduce((sum, n) => sum + (n.packetsReceived || 0) + (n.packetsSent || 0), 0);
+        const activeStreams = nodes.reduce((sum, n) => sum + (n.activeStreams || 0), 0);
 
         // Country Distribution
         const countryMap: Record<string, number> = {};
@@ -55,10 +58,38 @@ export default function NetworkPage() {
                 fill: versionColors[index % versionColors.length]
             }));
 
-        return { total, online, countryData, versionData };
+        return { total, online, countryData, versionData, networkTraffic, activeStreams };
     }, [nodes]);
 
-
+    // Loading skeleton
+    if (isLoading || tokenLoading) {
+        return (
+            <ContentLayout title="Network">
+                <div className="flex flex-1 flex-col gap-6">
+                    <div className="flex flex-col gap-4">
+                        <div>
+                            <Skeleton className="h-8 w-48 mb-2" />
+                            <Skeleton className="h-4 w-72" />
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                            {[...Array(4)].map((_, i) => (
+                                <Skeleton key={i} className="h-24 rounded-xl" />
+                            ))}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <Skeleton className="h-64 rounded-xl" />
+                            <Skeleton className="h-64 rounded-xl" />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Skeleton className="h-64 rounded-xl" />
+                            <Skeleton className="h-64 rounded-xl" />
+                        </div>
+                    </div>
+                    <Skeleton className="h-80 rounded-xl" />
+                </div>
+            </ContentLayout>
+        );
+    }
 
     return (
         <ContentLayout title="Network">
@@ -91,7 +122,9 @@ export default function NetworkPage() {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">{networkStats.online}</div>
+                                        <div className="text-2xl font-bold">
+                                            <NumberTicker value={networkStats.online} />
+                                        </div>
                                         <p className="text-xs text-muted-foreground">
                                             of {networkStats.total} total
                                         </p>
@@ -105,7 +138,7 @@ export default function NetworkPage() {
                                     </CardHeader>
                                     <CardContent>
                                         <div className="text-2xl font-bold">
-                                            {nodes?.reduce((sum, n) => sum + (n.packetsReceived || 0) + (n.packetsSent || 0), 0).toLocaleString() || 0}
+                                            <NumberTicker value={networkStats.networkTraffic} />
                                         </div>
                                         <p className="text-xs text-muted-foreground">
                                             packets/sec
@@ -120,7 +153,7 @@ export default function NetworkPage() {
                                     </CardHeader>
                                     <CardContent>
                                         <div className="text-2xl font-bold">
-                                            {nodes?.reduce((sum, n) => sum + (n.activeStreams || 0), 0) || 0}
+                                            <NumberTicker value={networkStats.activeStreams} />
                                         </div>
                                         <p className="text-xs text-muted-foreground">across network</p>
                                     </CardContent>
@@ -132,7 +165,9 @@ export default function NetworkPage() {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">${tokenData?.price?.toFixed(4) || "0.00"}</div>
+                                        <div className="text-2xl font-bold">
+                                            $<NumberTicker value={tokenData?.price || 0} decimalPlaces={4} />
+                                        </div>
                                         <p className={`text-xs flex items-center gap-1 ${(tokenData?.stats?.day24?.priceChange || 0) >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                                             {(tokenData?.stats?.day24?.priceChange || 0) >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                                             {Math.abs(tokenData?.stats?.day24?.priceChange || 0).toFixed(2)}%
