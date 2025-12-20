@@ -2,13 +2,14 @@
 
 High-performance API service that powers the Xandeum pNode Analytics Platform.
 
-## 🎯 What It Does
+## 🎯 Overview
 
-1. **Syncs pNode Data** - Fetches node info from pRPC every 30 seconds
-2. **Aggregates Stats** - CPU, RAM, storage, uptime, versions
-3. **Geo-locates Nodes** - IP-based country/city lookup
-4. **Caches Responses** - Redis caching for fast API responses
-5. **Serves REST API** - Clean endpoints for the dashboard
+The backend is responsible for:
+- **Syncing pNode data** from pRPC every 30 seconds
+- **Aggregating stats** (CPU, RAM, storage, uptime)
+- **Geo-locating nodes** via IP lookup
+- **Caching responses** in Redis (30s TTL)
+- **Serving REST API** for the dashboard
 
 ## 🛠️ Tech Stack
 
@@ -16,36 +17,38 @@ High-performance API service that powers the Xandeum pNode Analytics Platform.
 |-----------|------------|
 | Framework | [Hono](https://hono.dev) |
 | ORM | [Prisma](https://prisma.io) |
-| Database | PostgreSQL (DigitalOcean) |
-| Cache | Redis (Upstash) |
-| Validation | Zod + OpenAPI |
+| Database | PostgreSQL |
+| Cache | Upstash Redis |
+| Validation | Zod |
 | Logging | Pino |
-| Process Mgr | PM2 |
+| Deployment | PM2 on DigitalOcean |
 
 ## 📡 API Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/health` | GET | Service health check |
 | `/pnodes` | GET | All nodes with stats |
-| `/pnodes/stats` | GET | Network summary only |
+| `/pnodes/stats` | GET | Network summary |
 | `/pnodes/:ip` | GET | Single node details |
-| `/pnodes/sync` | POST | Manual sync trigger |
-| `/pnodes/cleanup` | POST | Remove stale nodes |
+| `/health` | GET | Service health |
 
-### Example Response
+## 🚀 Quick Start
 
-```json
-GET /pnodes/stats
-{
-  "total": 232,
-  "online": 188,
-  "with_public_rpc": 37,
-  "timestamp": "2025-12-20T09:10:52.468Z"
-}
+```bash
+# Install dependencies
+pnpm install
+
+# Configure environment
+cp .env.example .env
+
+# Run database migrations
+pnpm migrate
+
+# Start dev server
+pnpm dev
 ```
 
-## ⚙️ Environment Variables
+## 🔑 Environment Variables
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -54,74 +57,48 @@ GET /pnodes/stats
 | `UPSTASH_REDIS_REST_TOKEN` | ✅ | Upstash Redis token |
 | `PRPC_URL` | ✅ | pRPC endpoint |
 | `PORT` | ❌ | Server port (default: 3000) |
-| `SYNC_TOKEN` | ❌ | Auth token for sync endpoint |
 
-## 🚀 Quick Start
+## 📂 Project Structure
 
-```bash
-# Install
-pnpm install
-
-# Configure
-cp .env.example .env
-
-# Migrate database
-pnpm migrate
-
-# Development
-pnpm dev
-
-# Production
-pnpm build && pnpm start
 ```
+src/
+├── index.ts              # Server entry point
+├── routes/
+│   └── pnodes/           # pNode API routes
+│       ├── index.ts      # Route definitions
+│       └── routes.ts     # Handler logic
+└── lib/
+    ├── prisma-client.ts  # Database client
+    └── redis-client.ts   # Cache client
+
+prisma/
+├── schema.prisma         # Database schema
+└── migrations/           # Migration history
+```
+
+## 🔄 Sync Process
+
+Every 30 seconds:
+1. Fetch pod list from pRPC gossip
+2. Deduplicate by IP address
+3. Geo-locate via ip-api.com
+4. Query each node's RPC for stats
+5. Upsert to PostgreSQL
+6. Invalidate Redis cache
 
 ## 📦 Deployment
 
-Deployed on DigitalOcean VM with PM2:
-
 ```bash
-# On server
-./deploy.sh
+# SSH to server
+ssh deploy@your-server
 
-# Manual
+# Pull latest
+git pull origin main
+
+# Install & build
+pnpm install
+pnpm build
+
+# Restart with PM2
 pm2 restart xandeum-analytics
-pm2 logs xandeum-analytics
-```
-
-## 🔄 Sync Architecture
-
-```
-Every 30 seconds:
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│    pRPC     │ ──▶ │    Sync     │ ──▶ │  PostgreSQL │
-│ (gossip)    │     │   Service   │     │  (persist)  │
-└─────────────┘     └─────────────┘     └─────────────┘
-                          │
-                          ▼
-                    ┌─────────────┐
-                    │    Redis    │
-                    │   (cache)   │
-                    └─────────────┘
-```
-
-## 📊 Database Schema
-
-```prisma
-model PNode {
-  id                String    @id @default(uuid())
-  ip                String    @unique
-  address           String
-  pubkey            String?
-  version           String?
-  lastSeenTimestamp BigInt?
-  cpuPercent        Float?
-  ramUsedBytes      BigInt?
-  ramTotalBytes     BigInt?
-  totalBytes        BigInt?
-  uptimeSeconds     Int?
-  latitude          Float?
-  longitude         Float?
-  country           String?
-  city              String?
-}
 ```
