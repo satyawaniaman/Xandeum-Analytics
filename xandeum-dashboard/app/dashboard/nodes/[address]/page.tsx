@@ -35,6 +35,7 @@ import {
     Twitter
 } from "lucide-react";
 import { SingleNodeMap } from "@/components/dashboard/nodes/single-node-map";
+import { CreditsCard } from "@/components/dashboard/credits-card";
 import { generatePulseReport, generateTwitterShareUrl } from "@/lib/share-utils";
 import {
     Tooltip,
@@ -208,8 +209,8 @@ export default function NodeDetailPage({ params }: { params: Promise<{ address: 
                                         size="sm"
                                         onClick={copyStatsToClipboard}
                                         className={`gap-2 transition-all ${isStatsCopied
-                                                ? "bg-green-500/10 border-green-500/50 text-green-500"
-                                                : "hover:bg-primary/10 hover:border-primary/50"
+                                            ? "bg-green-500/10 border-green-500/50 text-green-500"
+                                            : "hover:bg-primary/10 hover:border-primary/50"
                                             }`}
                                     >
                                         {isStatsCopied ? <Check size={16} /> : <Copy size={16} />}
@@ -231,8 +232,8 @@ export default function NodeDetailPage({ params }: { params: Promise<{ address: 
                                         size="sm"
                                         onClick={handleWatchlistToggle}
                                         className={`gap-2 transition-all ${nodeIsWatched
-                                                ? "bg-yellow-500/10 border-yellow-500/50 text-yellow-500"
-                                                : "hover:bg-primary/10 hover:border-primary/50"
+                                            ? "bg-yellow-500/10 border-yellow-500/50 text-yellow-500"
+                                            : "hover:bg-primary/10 hover:border-primary/50"
                                             }`}
                                     >
                                         <Star size={16} className={nodeIsWatched ? "fill-current" : ""} />
@@ -309,7 +310,7 @@ export default function NodeDetailPage({ params }: { params: Promise<{ address: 
                     </Card>
                 </div>
 
-                {/* Row 2: Location & Identity + Network Traffic */}
+                {/* Row 2: Location & Identity + Credits Score */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Location & Identity */}
                     <Card className="rounded-xl border border-border">
@@ -377,7 +378,12 @@ export default function NodeDetailPage({ params }: { params: Promise<{ address: 
                         </CardContent>
                     </Card>
 
-                    {/* Network Traffic */}
+                    {/* Credit Score */}
+                    <CreditsCard pubkey={node.pubkey} />
+                </div>
+
+                {/* Row 3: Network Traffic (Full Width or Half) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card className="rounded-xl border border-border">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-base font-medium flex items-center gap-2">
