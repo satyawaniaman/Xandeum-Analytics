@@ -21,6 +21,8 @@ export const TOKENS = {
   SOL: new PublicKey("So11111111111111111111111111111111111111112"),
   // Xandeum Token
   XAND: new PublicKey("XANDuUoVoUqniKkpcKhrxmvYJybpJvUxJLr21Gaj3Hx"),
+  // XANDsol - Liquid Staking Token
+  XANDsol: new PublicKey("XAnDeUmMcqFyCdef9jzpNgtZPjTj3xUMj9eXKn2reFN"),
   // USD Coin
   USDC: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
   // Tether USD
@@ -31,8 +33,10 @@ export const TOKENS = {
 export const TOKEN_DECIMALS: Record<string, number> = {
   // SOL (wrapped)
   "So11111111111111111111111111111111111111112": 9,
-  // XAND (assuming 9 decimals like SOL - update if different)
+  // XAND
   "XANDuUoVoUqniKkpcKhrxmvYJybpJvUxJLr21Gaj3Hx": 9,
+  // XANDsol (liquid staking token)
+  "XAnDeUmMcqFyCdef9jzpNgtZPjTj3xUMj9eXKn2reFN": 9,
   // USDC
   "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": 6,
   // USDT

@@ -13,6 +13,7 @@ Modern web dashboard for monitoring the Xandeum pNode network in real-time.
 | **Pod Credits** | Node rankings and credit scores |
 | **Xandbot AI** | AI assistant trained on Xandeum docs |
 | **Token Swap** | Trade XAND via Jupiter integration |
+| **SOL Staking** | Stake SOL for XANDsol with rewards calculator |
 | **Theming** | Light, Dark, System, and Xandeum themes |
 
 ## 🛠️ Tech Stack
@@ -59,7 +60,8 @@ app/
 │   ├── nodes/page.tsx        # Node list
 │   ├── nodes/[address]/      # Node details
 │   ├── network/page.tsx      # Analytics
-│   └── trade/page.tsx        # Swap interface
+│   ├── trade/page.tsx        # Swap interface
+│   └── stake/page.tsx        # SOL staking
 ├── docs/                     # Documentation pages
 └── api/                      # API routes
 
@@ -86,6 +88,7 @@ hooks/
 | `/dashboard/nodes/:ip` | Node details |
 | `/dashboard/network` | Charts & analytics |
 | `/dashboard/trade` | Token swap |
+| `/dashboard/stake` | SOL staking for XANDsol |
 | `/docs` | Platform documentation |
 
 ## 🎨 Theming
