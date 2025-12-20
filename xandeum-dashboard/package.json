@@ -51,6 +51,7 @@
     "@types/axios": "^0.14.4",
     "@types/mdx": "^2.0.13",
     "@types/react-simple-maps": "^3.0.6",
+    "@vercel/analytics": "^1.6.1",
     "ai": "^5.0.115",
     "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",

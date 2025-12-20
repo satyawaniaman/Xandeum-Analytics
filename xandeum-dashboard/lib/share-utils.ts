@@ -56,7 +56,7 @@ export function generatePulseReport(node: PNode): string {
     const location = [node.city, node.country].filter(Boolean).join(", ") || "Unknown";
 
     const report = [
-        "🌐 XANDEUM PULSE REPORT",
+        "🌐 XANDEUM pNODE STATUS",
         "━━━━━━━━━━━━━━━━━━━━━━━",
         `📍 Node: ${node.address}`,
         `${statusEmoji} Status: ${statusLabel}`,
@@ -84,7 +84,7 @@ export function generateTwitterShareUrl(node: PNode): string {
 
     // Shorter format for Twitter's character limit
     const tweet = [
-        "🌐 XANDEUM PULSE REPORT",
+        "🌐 XANDEUM pNODE STATUS",
         "",
         `📍 Node: ${node.address}`,
         `${statusEmoji} Status: ${statusLabel}`,

@@ -165,9 +165,9 @@ export default function TradePage() {
         <ContentLayout title="Trade XAND">
             <div className="space-y-6">
                 {/* Chart and Swap Section */}
-                <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-280px)] min-h-[500px]">
+                <div className="flex flex-col lg:flex-row gap-6 lg:h-[calc(100vh-280px)] lg:min-h-[500px]">
                     {/* Price Chart - Takes 70% on desktop */}
-                    <div className="flex-1 lg:w-[70%] min-h-[350px] lg:min-h-0 h-full">
+                    <div className="flex-1 lg:w-[70%] h-[350px] lg:h-full">
                         <div className="h-full rounded-xl border border-border bg-card overflow-hidden flex flex-col">
                             <div className="p-4 border-b border-border">
                                 <h2 className="text-lg font-semibold text-foreground">XAND Price Chart</h2>
@@ -180,7 +180,7 @@ export default function TradePage() {
                     </div>
 
                     {/* Swap Widget */}
-                    <div className="w-full lg:w-[30%] lg:max-w-[450px] min-h-[450px] lg:min-h-0">
+                    <div className="w-full lg:w-[30%] lg:max-w-[450px]">
                         <SwapForm
                             className="h-full border-border bg-card"
                             showTokenBalance={true}
