@@ -1,6 +1,6 @@
 import { PNode, NodeStatus } from "./types";
 
-const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || "https://analytics.xandeum.network";
+const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || "https://www.xandeumstats.xyz/";
 
 /**
  * Get an emoji representation of a node status

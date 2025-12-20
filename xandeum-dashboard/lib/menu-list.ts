@@ -3,6 +3,7 @@ import { MonitorCheckIcon } from "@/components/ui/monitor-check";
 import { ChartLineIcon } from "@/components/ui/chart-line";
 import { SettingsIcon } from "@/components/ui/settings";
 import { ArrowLeftRightIcon } from "@/components/ui/arrow-left-right";
+import { CoinsIcon } from "@/components/ui/coins";
 import { ComponentType } from "react";
 import { BookOpenIcon } from "@/components/ui/book-open";
 
@@ -63,6 +64,11 @@ export function getMenuList(_pathname: string): Group[] {
                     href: "/dashboard/trade",
                     label: "Trade XAND",
                     icon: ArrowLeftRightIcon
+                },
+                {
+                    href: "/dashboard/stake",
+                    label: "Stake SOL",
+                    icon: CoinsIcon
                 }
             ]
         },

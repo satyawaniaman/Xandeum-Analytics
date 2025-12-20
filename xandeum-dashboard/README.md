@@ -1,43 +1,20 @@
 # Xandeum Analytics Dashboard
 
-Modern, responsive web dashboard for monitoring the Xandeum pNode network.
+Modern web dashboard for monitoring the Xandeum pNode network in real-time.
 
 ## ✨ Features
 
-### 📊 Network Overview
-- Real-time node statistics with animated counters
-- Interactive world map with clustered markers
-- Status distribution charts
-- Network health gauge
-
-### 🖥️ Node Monitoring
-- Searchable, filterable node list
-- Individual node detail pages
-- Performance metrics (CPU, RAM, storage)
-- Version and uptime tracking
-
-### 💰 Token Analytics
-- Live XAND price from DexScreener
-- 24h price/liquidity charts
-- Swap interface (Jupiter-powered)
-- Wallet connection (Phantom, Solflare)
-
-### 🏆 Pod Credits
-- Credit score display on node details
-- Network rank (#X of Y nodes)
-- Performance tier badges
-- Top performers leaderboard
-
-### 🤖 Xandbot AI Assistant
-- Powered by Google Gemini
-- Trained on official Xandeum docs
-- Real-time network context
-- Rate limited (10 req/min)
-
-### 🎨 Theming
-- Light / Dark / System modes
-- Custom Xandeum brand theme
-- Mobile-responsive design
+| Feature | Description |
+|---------|-------------|
+| **Real-time Stats** | Live node counts with animated number tickers |
+| **Interactive Map** | World map with clustered node markers |
+| **Node Monitoring** | Searchable list with detailed node pages |
+| **Token Analytics** | XAND price and liquidity charts |
+| **Pod Credits** | Node rankings and credit scores |
+| **Xandbot AI** | AI assistant trained on Xandeum docs |
+| **Token Swap** | Trade XAND via Jupiter integration |
+| **SOL Staking** | Stake SOL for XANDsol with rewards calculator |
+| **Theming** | Light, Dark, System, and Xandeum themes |
 
 ## 🛠️ Tech Stack
 
@@ -49,52 +26,8 @@ Modern, responsive web dashboard for monitoring the Xandeum pNode network.
 | Charts | Recharts |
 | Maps | React Simple Maps |
 | State | TanStack Query + Zustand |
-| Animation | Framer Motion |
 | AI | Vercel AI SDK + Gemini |
 | Wallet | Solana Wallet Adapter |
-
-## 📁 Project Structure
-
-```
-app/
-├── dashboard/
-│   ├── page.tsx              # Main overview
-│   ├── nodes/
-│   │   ├── page.tsx          # Node list
-│   │   └── [address]/page.tsx  # Node details
-│   ├── network/page.tsx      # Network analytics
-│   └── trade/page.tsx        # Swap interface
-└── api/
-    ├── chat/route.ts         # Xandbot API
-    ├── pod-credits/route.ts  # Credits proxy
-    └── proxy/route.ts        # Backend proxy
-
-components/
-├── dashboard/
-│   ├── node-map.tsx          # Interactive map
-│   ├── stat-card.tsx         # Animated stats
-│   ├── credits-card.tsx      # Credit score
-│   └── mini-nodes-table.tsx  # Top performers
-├── ai-chat-drawer.tsx        # Xandbot drawer
-└── ui/                       # Shadcn components
-
-hooks/
-├── use-pnodes.ts             # Node data hook
-├── use-xandeum-token.ts      # Token data hook
-└── use-pod-credits.ts        # Credits hook
-```
-
-## ⚙️ Environment Variables
-
-Create `.env.local`:
-
-```bash
-# Backend API URL
-NEXT_PUBLIC_API_URL=https://your-api.com
-
-# Gemini API Key (for Xandbot)
-GEMINI_API_KEY=your-gemini-api-key
-```
 
 ## 🚀 Quick Start
 
@@ -102,62 +35,78 @@ GEMINI_API_KEY=your-gemini-api-key
 # Install dependencies
 pnpm install
 
+# Configure environment
+cp .env.example .env.local
+
 # Start dev server
 pnpm dev
+```
 
-# Build for production
-pnpm build
-pnpm start
+Open [http://localhost:3000](http://localhost:3000)
+
+## 🔑 Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_API_URL` | Backend API base URL |
+| `GEMINI_API_KEY` | Google Gemini API key (for Xandbot) |
+
+## 📂 Project Structure
+
+```
+app/
+├── dashboard/
+│   ├── page.tsx              # Main overview
+│   ├── nodes/page.tsx        # Node list
+│   ├── nodes/[address]/      # Node details
+│   ├── network/page.tsx      # Analytics
+│   ├── trade/page.tsx        # Swap interface
+│   └── stake/page.tsx        # SOL staking
+├── docs/                     # Documentation pages
+└── api/                      # API routes
+
+components/
+├── dashboard/                # Feature components
+│   ├── node-map.tsx          # Interactive map
+│   ├── stat-card.tsx         # Animated cards
+│   └── credits-card.tsx      # Credit display
+├── ai-chat-drawer.tsx        # Xandbot UI
+└── ui/                       # Shadcn components
+
+hooks/
+├── use-pnodes.ts             # Node data
+├── use-xandeum-token.ts      # Token data
+└── use-pod-credits.ts        # Credits data
 ```
 
 ## 📱 Pages
 
 | Route | Description |
 |-------|-------------|
-| `/` | Landing / redirect |
-| `/dashboard` | Main overview with map |
+| `/dashboard` | Overview with map & KPIs |
 | `/dashboard/nodes` | Full node list |
 | `/dashboard/nodes/:ip` | Node details |
 | `/dashboard/network` | Charts & analytics |
 | `/dashboard/trade` | Token swap |
+| `/dashboard/stake` | SOL staking for XANDsol |
+| `/docs` | Platform documentation |
 
 ## 🎨 Theming
 
-Switch themes via the navbar toggle:
-
-- **Light** - Clean white UI
-- **Dark** - Dark mode
-- **System** - Follow OS preference
-- **Xandeum** - Custom brand colors with background
-
-## 🤖 Xandbot Configuration
-
-Xandbot uses the Vercel AI SDK with Google Gemini:
-
-```typescript
-// app/api/chat/route.ts
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
-const model = google('gemini-2.0-flash');
-```
-
-To change models (if hitting quota):
-- `gemini-1.5-flash` - More available quota
-- `gemini-1.5-pro` - Higher quality
+Access via navbar settings:
+- **Light** — Clean white interface
+- **Dark** — Dark mode
+- **System** — Follows OS preference
+- **Xandeum** — Custom brand colors
 
 ## 📦 Deployment
 
-Deploy on Vercel (recommended) or any Node.js host:
-
 ```bash
-# Build
+# Build for production
 pnpm build
 
 # Start production server
 pnpm start
 ```
 
-Required env vars on host:
-- `NEXT_PUBLIC_API_URL`
-- `GEMINI_API_KEY`
+Deploy on Vercel, Railway, or any Node.js host.
