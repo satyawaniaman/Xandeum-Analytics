@@ -1,30 +1,170 @@
 export const metadata = {
-  title: 'Backend & Data Collection',
-  description: 'How Xandeum collects and processes network data',
+  title: 'Backend API',
+  description: 'API reference for the Xandeum Analytics backend',
 };
 
-# Backend Architecture
+# Backend API
 
-The Xandeum Analytics backend is responsible for ingesting, validating, and serving network data. It serves as the bridge between the distributed mesh of pNodes and the public dashboard.
+The backend API provides RESTful endpoints for accessing pNode data. All responses are JSON-formatted.
 
-## Data Collection Pipeline
+## Base URL
 
-### xandminerd Reporting
-Each running `xandminerd` daemon periodically emits a heartbeat to the analytics ingress nodes. This heartbeat contains:
-1. **Identity**: The node's Public Key signed with its private key to prove ownership.
-2. **Telemetry**: Current CPU load, RAM usage, and disk space availability.
-3. **Network Info**: Current public IP and pRPC port status.
+```
+https://your-api-domain.com
+```
 
-### Aggregation & Verification
-The backend receives these reports and performs several checks:
-- **Signature Verification**: Validates that the report was signed by the claimed Pubkey.
-- **PoPA Validation**: Cross-references the reported location with the Proof-of-Physical-Address data stored on-chain.
-- **Liveness Tracking**: Updates the "Last Seen" timestamp. Nodes silent for more than 5 minutes are transitioned to "Not Recently Seen" status.
+## Endpoints
 
-## Storage
-Data is persisted in a hybrid storage model:
-- **TimescaleDB / PostgreSQL**: For historical metric data allowing for efficient time-series queries.
-- **Redis**: For caching real-time state and "hot" data like the current list of online nodes (TTL 30 seconds).
+### GET /pnodes
 
-## Identity Persistence
-The backend strictly adheres to the "Pubkey as Identity" principle. If a node reports from a new IP address but the same Public Key, the system updates the existing node record rather than creating a duplicate. This ensures historical performance data is preserved seamlessly during network migrations.
+Returns all pNodes with full details.
+
+**Response:**
+```json
+{
+  "summary": {
+    "total": 232,
+    "online_public": 37,
+    "online_private": 151,
+    "offline": 40,
+    "unknown": 4
+  },
+  "nodes": [
+    {
+      "id": "uuid",
+      "ip": "123.45.67.89",
+      "address": "123.45.67.89:8000",
+      "pubkey": "abc123...",
+      "version": "0.2.5",
+      "status": "online_public",
+      "lastSeen": "2 minutes ago",
+      "cpuPercent": 15.5,
+      "ramUsedBytes": 4294967296,
+      "ramTotalBytes": 17179869184,
+      "latitude": 52.52,
+      "longitude": 13.405,
+      "country": "Germany",
+      "city": "Berlin"
+    }
+  ],
+  "timestamp": "2025-12-20T10:00:00.000Z"
+}
+```
+
+---
+
+### GET /pnodes/stats
+
+Returns network summary only (smaller payload).
+
+**Response:**
+```json
+{
+  "total": 232,
+  "online": 188,
+  "with_public_rpc": 37,
+  "timestamp": "2025-12-20T10:00:00.000Z"
+}
+```
+
+---
+
+### GET /pnodes/:ip
+
+Returns details for a single node by IP address.
+
+**URL Parameters:**
+- `ip` — The node's IP address (URL-encoded if needed)
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "ip": "123.45.67.89",
+  "address": "123.45.67.89:8000",
+  "pubkey": "abc123...",
+  "version": "0.2.5",
+  "status": "online_public",
+  "lastSeen": "2 minutes ago",
+  "cpuPercent": 15.5,
+  "ramUsedBytes": 4294967296,
+  "ramTotalBytes": 17179869184,
+  "uptimeSeconds": 86400,
+  "packetsReceived": 1500,
+  "packetsSent": 1200,
+  "latitude": 52.52,
+  "longitude": 13.405,
+  "country": "Germany",
+  "city": "Berlin"
+}
+```
+
+---
+
+### GET /health
+
+Returns service health status.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-12-20T10:00:00.000Z",
+  "services": {
+    "database": "ok",
+    "redis": "ok",
+    "prpc": "configured"
+  },
+  "uptime": 86400,
+  "version": "1.0.0"
+}
+```
+
+---
+
+## Caching
+
+All endpoints are cached in Redis with a **30-second TTL**. This means:
+
+- Data is at most 30 seconds old
+- Repeated requests are fast (< 10ms)
+- Sync service refreshes the source data every 30 seconds
+
+## Rate Limiting
+
+Currently, no rate limiting is applied to read endpoints. For production deployments, consider:
+
+- Cloudflare rate limiting
+- API key authentication
+- Request throttling
+
+## Error Responses
+
+<table>
+  <thead>
+    <tr>
+      <th>Status</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>404</td>
+      <td>Node not found</td>
+    </tr>
+    <tr>
+      <td>500</td>
+      <td>Internal server error</td>
+    </tr>
+    <tr>
+      <td>503</td>
+      <td>Service unavailable (DB/Redis down)</td>
+    </tr>
+  </tbody>
+</table>
+
+```json
+{
+  "error": "Node not found"
+}
+```

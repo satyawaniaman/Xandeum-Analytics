@@ -1,35 +1,47 @@
 export const metadata = {
   title: 'Introduction',
-  description: 'Comprehensive documentation for the Xandeum Intelligence Platform',
+  description: 'Documentation for Xandeum Analytics - Real-time pNode monitoring platform',
 };
 
-# Welcome to Xandeum Intelligence
+# Welcome to Xandeum Analytics
 
-The Xandeum Intelligence Platform is a comprehensive analytics and management interface for the Xandeum storage network. It provides real-time visibility into the distribution, health, and performance of storage nodes across the globe.
+**Xandeum Analytics** is a community-built monitoring platform for the Xandeum decentralized storage network. It provides real-time visibility into the distribution, health, and performance of pNodes across the globe.
 
-## Network Architecture
+> **Community Project**: This platform is built by the community to support Xandeum operators and enthusiasts. It is not an official Xandeum product.
 
-Understanding the Xandeum network requires familiarity with its core components and how they interact.
+## What You Can Do
+
+- **Monitor the Network** — View live statistics for 200+ pNodes worldwide
+- **Track Node Performance** — CPU, RAM, storage, and uptime metrics
+- **See Global Distribution** — Interactive map showing node locations
+- **Analyze Token Data** — XAND price, liquidity, and market trends
+- **Ask Xandbot** — AI assistant trained on Xandeum documentation
+- **View Pod Credits** — Node credit scores and network rankings
+- **Swap Tokens** — Trade XAND directly through Jupiter integration
+
+## Quick Navigation
+
+<Cards>
+  <Card title="Platform Architecture" href="/docs/platform/architecture" />
+  <Card title="Xandbot AI" href="/docs/features/xandbot" />
+  <Card title="Pod Credits" href="/docs/features/pod-credits" />
+  <Card title="Token Swaps" href="/docs/features/swaps" />
+</Cards>
+
+## Network Concepts
 
 ### pNode (Physical Node)
-A **pNode** refers to the collective hardware infrastructure—the server itself. It includes the physical machine, CPU, memory, storage drives, and network interface. The pNode provides the raw resources required to store data and participate in the network.
+A **pNode** is the physical hardware infrastructure — the server itself. It includes the machine, CPU, memory, storage, and network interface that provides resources to the Xandeum network.
 
 ### pod (Software Unit)
-A **pod** is the specific piece of software that runs on top of a pNode. It is responsible for the actual storage functions, including:
-- Data replication and sharding.
-- Proof-of-Physical-Address (PoPA) verification.
-- Inter-node communication via pRPC.
+A **pod** is the software that runs on a pNode. It handles:
+- Data replication and sharding
+- Proof-of-Physical-Address (PoPA) verification
+- Inter-node communication via pRPC
 
-### xandminer
-**xandminer** is the graphical user interface (GUI) software used for local management of a node. It allows operators to configure their node, view local logs, and manage their wallet connections.
+### Identity Model
+Nodes are identified by their **Public Key (pubkey)**, not IP address:
+- **Pubkey** — Permanent cryptographic identifier tied to the operator's Solana wallet
+- **IP Address** — Ephemeral metadata used for geolocation, not identity
 
-### xandminerd
-**xandminerd** is the background daemon process that powers xandminer. It runs continuously on the server, collecting system metrics, handling network protocols, and feeding real-time information to the xandminer interface and the central analytics platform.
-
-## Identity Model
-
-In the Xandeum network, identity is cryptographic. We treat the **Public Key (pubkey)** as the primary identity of a node, not the IP address.
-- **Pubkey**: A permanent, cryptographic identifier derived from the node's Solana wallet. It persists even if the node changes location or network providers.
-- **IP Address**: Treated as ephemeral metadata. While we track it for geolocation maps, it is not used to uniquely identify a node for rewards or reputation.
-
-This distinction ensures that node reputation and history are tied to the operator's cryptographic signature, promoting security and allowing for flexible infrastructure management.
+This ensures reputation and history persist even when a node changes networks.

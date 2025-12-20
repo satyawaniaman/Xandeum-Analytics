@@ -23,7 +23,7 @@ export function DashboardFooter() {
                         <DiscordIcon size={20} />
                     </Link>
                     <Link
-                        href="https://twitter.com/xandeum"
+                        href="https://x.com/xandeumstats"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-2 rounded-full bg-muted hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
@@ -31,7 +31,7 @@ export function DashboardFooter() {
                         <TwitterIcon size={20} />
                     </Link>
                     <Link
-                        href="https://github.com/xandeum"
+                        href="https://github.com/satyawaniaman/Xandeum-Analytics"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-2 rounded-full bg-muted hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
@@ -43,7 +43,7 @@ export function DashboardFooter() {
                 {/* Copyright and Links */}
                 <div className="flex flex-col items-center gap-2 text-xs text-muted-foreground">
                     <div className="flex items-center gap-2">
-                        <span>© {currentYear} Xandeum</span>
+                        <span>© {currentYear} Xandeum Analytics</span>
                         <span className="text-border">|</span>
                         <Link href="/terms" className="hover:text-foreground transition-colors">
                             Terms
@@ -62,7 +62,7 @@ export function DashboardFooter() {
                         className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <ExternalLink className="h-3 w-3" />
-                        <span>Read the Docs</span>
+                        <span>Read the Official Docs</span>
                     </Link>
 
                     {/* Community Disclaimer */}

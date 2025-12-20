@@ -1,0 +1,155 @@
+export const metadata = {
+  title: 'Pod Credits',
+  description: 'Understanding pNode credit scores and rankings',
+};
+
+# Pod Credits
+
+**Pod Credits** are lifetime scores earned by pNodes for their contributions to the Xandeum network. The dashboard displays credit scores and rankings for each node.
+
+## What Are Pod Credits?
+
+Credits are points accumulated by nodes over time based on:
+
+- **Uptime** — How consistently the node stays online
+- **Version Compliance** — Running the latest software version
+- **Network Contribution** — Successful data storage and retrieval
+
+Higher credits indicate a more reliable, well-maintained node.
+
+## Viewing Credits
+
+### On Node Details Page
+
+Navigate to any node's detail page (`/dashboard/nodes/:ip`) to see:
+
+- **Credit Score** — Total lifetime credits
+- **Network Rank** — Position among all nodes (e.g., #5 of 232)
+- **Performance Tier** — Badge based on ranking percentile
+
+### On Dashboard Overview
+
+The main dashboard shows a **Top Performers** table ranked by credits:
+
+<table>
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Node</th>
+      <th>Credits</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>#1</td>
+      <td><code>abc123...</code></td>
+      <td>15,847</td>
+    </tr>
+    <tr>
+      <td>#2</td>
+      <td><code>def456...</code></td>
+      <td>14,392</td>
+    </tr>
+    <tr>
+      <td>#3</td>
+      <td><code>ghi789...</code></td>
+      <td>13,105</td>
+    </tr>
+  </tbody>
+</table>
+
+## Performance Tiers
+
+Nodes receive badges based on their ranking percentile:
+
+<table>
+  <thead>
+    <tr>
+      <th>Tier</th>
+      <th>Criteria</th>
+      <th>Badge Color</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Elite</strong></td>
+      <td>Top 10%</td>
+      <td>Gold</td>
+    </tr>
+    <tr>
+      <td><strong>High</strong></td>
+      <td>Top 25%</td>
+      <td>Purple</td>
+    </tr>
+    <tr>
+      <td><strong>Good</strong></td>
+      <td>Top 50%</td>
+      <td>Blue</td>
+    </tr>
+    <tr>
+      <td><strong>Average</strong></td>
+      <td>Bottom 50%</td>
+      <td>Gray</td>
+    </tr>
+  </tbody>
+</table>
+
+## How Credits Are Calculated
+
+The credit system is managed by the Xandeum network, not this dashboard. We fetch scores from the official **Pod Credits API**.
+
+Key factors include:
+
+1. **Consecutive Uptime** — Longer uptime streaks earn more
+2. **Version Updates** — Promptly updating earns bonus credits
+3. **Reliability** — Consistent availability over time
+4. **Response Time** — Faster RPC responses may factor in
+
+> **Note**: Exact credit calculation formulas are determined by Xandeum core team and may be updated.
+
+## API Integration
+
+### Data Source
+
+Credits are fetched from:
+```
+https://credits.xandeum.com/
+```
+
+### Caching
+
+- Dashboard caches credit data for **30 seconds**
+- A server-side proxy avoids CORS issues
+- Stale data shows while fresh data loads
+
+### Matching Nodes
+
+Credits are matched to nodes using the **pod_id** field, which corresponds to the node's **public key (pubkey)**.
+
+```
+credits.pod_id === node.pubkey
+```
+
+## Tips for Node Operators
+
+To maximize your credits:
+
+1. **Maximize uptime** — Keep your node running 24/7
+2. **Update promptly** — Install new versions within hours of release
+3. **Monitor resources** — Ensure sufficient CPU, RAM, and storage
+4. **Stable network** — Use reliable internet with low latency
+5. **Check the dashboard** — Monitor your node's status regularly
+
+## FAQ
+
+### Why is my credit score 0?
+New nodes start with 0 credits. Run your node consistently to accumulate credits.
+
+### Why can't I see my node's rank?
+If your node's pubkey doesn't match any pod_id in the credits API, it won't show credits. Ensure your node is properly registered.
+
+### How often are credits updated?
+The credits API updates periodically. Dashboard refreshes every 30 seconds.
+
+### Can I lose credits?
+Credits are lifetime totals. However, extended downtime may slow your credit accumulation rate.

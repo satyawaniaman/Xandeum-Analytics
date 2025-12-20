@@ -1,0 +1,251 @@
+export const metadata = {
+  title: 'Platform Architecture',
+  description: 'Technical architecture of the Xandeum Analytics platform',
+};
+
+# Platform Architecture
+
+The Xandeum Analytics platform consists of two main components: a **Backend API** that syncs and serves data, and a **Frontend Dashboard** that visualizes it.
+
+## System Overview
+
+<img src="/architecture-diagram.png" height="500" width="500" alt="Xandeum Analytics Architecture" className="rounded-lg border border-border my-6" />
+
+---
+
+## Backend
+
+### Tech Stack
+
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Technology</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Framework</td>
+      <td>Hono</td>
+      <td>Fast, lightweight web framework</td>
+    </tr>
+    <tr>
+      <td>ORM</td>
+      <td>Prisma</td>
+      <td>Type-safe database access</td>
+    </tr>
+    <tr>
+      <td>Database</td>
+      <td>PostgreSQL</td>
+      <td>Persistent node data</td>
+    </tr>
+    <tr>
+      <td>Cache</td>
+      <td>Upstash Redis</td>
+      <td>Response caching (30s TTL)</td>
+    </tr>
+    <tr>
+      <td>Validation</td>
+      <td>Zod</td>
+      <td>Request/response schemas</td>
+    </tr>
+    <tr>
+      <td>Logging</td>
+      <td>Pino</td>
+      <td>Structured JSON logs</td>
+    </tr>
+  </tbody>
+</table>
+
+### Data Collection
+
+The backend syncs pNode data every **30 seconds**:
+
+1. **Fetch from pRPC** — Get latest pod list from gossip network
+2. **Deduplicate** — Keep one record per IP (most recent)
+3. **Geo-locate** — Look up country/city from IP address
+4. **Fetch Stats** — Query each node's RPC for CPU/RAM/storage
+5. **Persist** — Upsert to PostgreSQL by IP
+6. **Cache** — Invalidate Redis cache
+
+### API Endpoints
+
+<table>
+  <thead>
+    <tr>
+      <th>Endpoint</th>
+      <th>Method</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>/pnodes</code></td>
+      <td>GET</td>
+      <td>All nodes with full details</td>
+    </tr>
+    <tr>
+      <td><code>/pnodes/stats</code></td>
+      <td>GET</td>
+      <td>Network summary only</td>
+    </tr>
+    <tr>
+      <td><code>/pnodes/:ip</code></td>
+      <td>GET</td>
+      <td>Single node by IP</td>
+    </tr>
+    <tr>
+      <td><code>/health</code></td>
+      <td>GET</td>
+      <td>Service health check</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## Frontend
+
+### Tech Stack
+
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Technology</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Framework</td>
+      <td>Next.js 16</td>
+      <td>React with App Router</td>
+    </tr>
+    <tr>
+      <td>UI Library</td>
+      <td>Shadcn UI</td>
+      <td>Beautiful components</td>
+    </tr>
+    <tr>
+      <td>Styling</td>
+      <td>Tailwind CSS</td>
+      <td>Utility-first CSS</td>
+    </tr>
+    <tr>
+      <td>Charts</td>
+      <td>Recharts</td>
+      <td>Data visualization</td>
+    </tr>
+    <tr>
+      <td>Maps</td>
+      <td>React Simple Maps</td>
+      <td>Geographic display</td>
+    </tr>
+    <tr>
+      <td>State</td>
+      <td>TanStack Query</td>
+      <td>Data fetching & caching</td>
+    </tr>
+    <tr>
+      <td>AI</td>
+      <td>Vercel AI SDK</td>
+      <td>Xandbot integration</td>
+    </tr>
+    <tr>
+      <td>Wallet</td>
+      <td>Solana Wallet Adapter</td>
+      <td>Phantom, Solflare</td>
+    </tr>
+  </tbody>
+</table>
+
+### Key Pages
+
+<table>
+  <thead>
+    <tr>
+      <th>Route</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>/dashboard</code></td>
+      <td>Main overview with map and KPIs</td>
+    </tr>
+    <tr>
+      <td><code>/dashboard/nodes</code></td>
+      <td>Full node list with search</td>
+    </tr>
+    <tr>
+      <td><code>/dashboard/nodes/:ip</code></td>
+      <td>Individual node details</td>
+    </tr>
+    <tr>
+      <td><code>/dashboard/network</code></td>
+      <td>Charts and analytics</td>
+    </tr>
+    <tr>
+      <td><code>/dashboard/trade</code></td>
+      <td>Token swap interface</td>
+    </tr>
+  </tbody>
+</table>
+
+### Data Flow
+
+1. **React Query** fetches data from backend API
+2. **Caching** prevents unnecessary refetches (stale time: 30s)
+3. **Optimistic updates** for responsive UI
+4. **Real-time polling** keeps data fresh
+
+---
+
+## External Integrations
+
+<table>
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>pRPC</strong></td>
+      <td>Node gossip data (every 30s)</td>
+    </tr>
+    <tr>
+      <td><strong>DexScreener</strong></td>
+      <td>XAND price and liquidity</td>
+    </tr>
+    <tr>
+      <td><strong>Pod Credits API</strong></td>
+      <td>Node credit scores</td>
+    </tr>
+    <tr>
+      <td><strong>Gemini AI</strong></td>
+      <td>Xandbot responses</td>
+    </tr>
+    <tr>
+      <td><strong>ip-api.com</strong></td>
+      <td>IP geolocation</td>
+    </tr>
+    <tr>
+      <td><strong>Jupiter</strong></td>
+      <td>Token swap routes</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## Deployment
+
+- **Backend**: DigitalOcean VM with PM2 process manager
+- **Database**: DigitalOcean Managed PostgreSQL
+- **Cache**: Upstash Redis (serverless)
+- **Frontend**: Vercel or any Node.js host

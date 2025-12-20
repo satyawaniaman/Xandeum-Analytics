@@ -80,29 +80,34 @@ export function getMenuList(_pathname: string): Group[] {
                             active: _pathname === "/docs"
                         },
                         {
+                            href: "/docs/platform/architecture",
+                            label: "Platform Architecture",
+                            active: _pathname === "/docs/platform/architecture"
+                        },
+                        {
                             href: "/docs/platform/backend",
-                            label: "Platform Backend",
+                            label: "Backend API",
                             active: _pathname === "/docs/platform/backend"
                         },
                         {
                             href: "/docs/platform/frontend",
-                            label: "Platform Frontend",
+                            label: "Dashboard Features",
                             active: _pathname === "/docs/platform/frontend"
+                        },
+                        {
+                            href: "/docs/features/xandbot",
+                            label: "Xandbot AI",
+                            active: _pathname === "/docs/features/xandbot"
+                        },
+                        {
+                            href: "/docs/features/pod-credits",
+                            label: "Pod Credits",
+                            active: _pathname === "/docs/features/pod-credits"
                         },
                         {
                             href: "/docs/features/swaps",
                             label: "Token Swaps",
                             active: _pathname === "/docs/features/swaps"
-                        },
-                        {
-                            href: "/docs/develop/api",
-                            label: "API Reference",
-                            active: _pathname === "/docs/develop/api"
-                        },
-                        {
-                            href: "/docs/develop/integrations",
-                            label: "Integrations",
-                            active: _pathname === "/docs/develop/integrations"
                         }
                     ]
                 }
