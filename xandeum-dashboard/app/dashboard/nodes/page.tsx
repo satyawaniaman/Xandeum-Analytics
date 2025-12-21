@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ContentLayout } from "@/components/dashboard-panel/content-layout";
 import {
     Breadcrumb,
@@ -19,6 +20,8 @@ import { exportNodes } from "@/lib/export-utils";
 
 export default function NodesPage() {
     const { data, isLoading, error, refetch } = usePNodes();
+    const searchParams = useSearchParams();
+    const searchQuery = searchParams.get("search") || "";
 
     const handleRefresh = () => {
         refetch();
@@ -129,7 +132,7 @@ export default function NodesPage() {
 
             {/* Nodes Table */}
             <div className="mt-6">
-                <DataTable nodes={nodes} />
+                <DataTable nodes={nodes} initialSearch={searchQuery} />
             </div>
         </ContentLayout>
     );

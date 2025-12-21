@@ -36,13 +36,14 @@ import { Card } from "@/components/ui/card";
 
 interface DataTableProps {
     nodes: PNode[];
+    initialSearch?: string;
 }
 
 type SortKey = "lastSeenAgoSeconds" | "uptimeSeconds" | "cpuPercent" | "ramUsagePercent" | "storageUtilizationPercent";
 type SortDirection = "asc" | "desc";
 
-export function DataTable({ nodes }: DataTableProps) {
-    const [searchTerm, setSearchTerm] = React.useState("");
+export function DataTable({ nodes, initialSearch = "" }: DataTableProps) {
+    const [searchTerm, setSearchTerm] = React.useState(initialSearch);
     const [statusFilter, setStatusFilter] = React.useState<string>("all");
     const [versionFilter, setVersionFilter] = React.useState<string>("all");
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -53,6 +54,11 @@ export function DataTable({ nodes }: DataTableProps) {
     const router = useRouter();
 
     const itemsPerPage = 10;
+
+    // Sync with URL param if it changes
+    React.useEffect(() => {
+        setSearchTerm(initialSearch);
+    }, [initialSearch]);
 
     // reset pagination when filters change
     React.useEffect(() => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { ModeToggle } from "@/components/mode-toggle";
 import { SheetMenu } from "@/components/dashboard-panel/sheet-menu";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ export function Navbar({ title, onRefresh, onSearch, onExport, networkStatus = "
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const iconRef = useRef<RotateCWIconHandle>(null);
+  const router = useRouter();
 
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
@@ -46,6 +48,13 @@ export function Navbar({ title, onRefresh, onSearch, onExport, networkStatus = "
     const query = e.target.value;
     setSearchQuery(query);
     onSearch?.(query);
+  };
+
+  const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      // Navigate to nodes page with search query
+      router.push(`/dashboard/nodes?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   const handleExport = (format: "json" | "csv") => {
@@ -85,9 +94,10 @@ export function Navbar({ title, onRefresh, onSearch, onExport, networkStatus = "
             <SearchIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Search nodes..."
+              placeholder="Search nodes... (Press Enter)"
               value={searchQuery}
               onChange={handleSearchChange}
+              onKeyDown={handleSearchSubmit}
               className="pl-10 bg-input border-border text-foreground placeholder:text-muted-foreground focus:border-ring h-9"
             />
           </div>
