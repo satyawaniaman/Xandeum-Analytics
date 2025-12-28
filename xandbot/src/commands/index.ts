@@ -1,6 +1,6 @@
 import type { Telegraf, Context } from "telegraf";
-import { XandeumAPI } from "../api";
-import { escapeMarkdown } from "../utils";
+import { XandeumAPI } from "../api.js";
+import { escapeMarkdown } from "../utils.js";
 
 export function registerCommands(bot: Telegraf<Context>, apiBaseUrl: string) {
     const api = new XandeumAPI(apiBaseUrl);
