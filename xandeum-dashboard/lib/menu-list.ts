@@ -6,6 +6,7 @@ import { ArrowLeftRightIcon } from "@/components/ui/arrow-left-right";
 import { CoinsIcon } from "@/components/ui/coins";
 import { ComponentType } from "react";
 import { BookOpenIcon } from "@/components/ui/book-open";
+import { Bot } from "lucide-react";
 
 type Submenu = {
     href: string;
@@ -69,6 +70,16 @@ export function getMenuList(_pathname: string): Group[] {
                     href: "/dashboard/stake",
                     label: "Stake SOL",
                     icon: CoinsIcon
+                }
+            ]
+        },
+        {
+            groupLabel: "Tools",
+            menus: [
+                {
+                    href: "/dashboard/assistant",
+                    label: "Telegram Bot",
+                    icon: Bot
                 }
             ]
         },
